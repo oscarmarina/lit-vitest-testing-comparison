@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Demo - counter-element</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <meta name="description" content="counter-element" />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="demo"></div>
+
+    <script type="module">
+      import { html, render } from 'lit';
+      import '../define/counter-element.js';
+
+      const heading = 'World!';
+      render(
+        html`<counter-element
+          @counterchange="${ev => console.log('==>', ev.detail)}"
+          .heading=${heading}
+          >some light-dom</counter-element
+        >`,
+        document.querySelector('#demo'),
+      );
+    </script>
+  </body>
+</html>
