@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { beforeAll, afterAll, suite, expect, vi, test } from 'vitest';
-import { assert, fixture, fixtureCleanup, html } from '@open-wc/testing';
+import { beforeAll, afterAll, suite, expect, vi, test, assert } from 'vitest';
+import { assert as a11y, fixture, fixtureCleanup, html } from '@open-wc/testing';
 // import { $ } from '@wdio/globals';
 import sinon from 'sinon';
 import { structureSnapshot } from './utils.js';
@@ -18,7 +18,6 @@ suite('Lit Component testing', () => {
     beforeAll(async () => {
       el = await fixture(html`<counter-element>light-dom</counter-element>`);
       elShadowRoot = el?.shadowRoot;
-      await el.updateComplete;
       // el$ = await $('counter-element');
     });
 
@@ -40,7 +39,7 @@ suite('Lit Component testing', () => {
     });
 
     test('a11y', async () => {
-      await assert.isAccessible(el);
+      await a11y.isAccessible(el);
     });
   });
 
@@ -48,7 +47,6 @@ suite('Lit Component testing', () => {
     beforeAll(async () => {
       el = await fixture(html`<counter-element>light-dom</counter-element>`);
       elShadowRoot = el?.shadowRoot;
-      await el.updateComplete;
     });
 
     afterAll(() => {
@@ -70,7 +68,7 @@ suite('Lit Component testing', () => {
       const spy = sinon.spy(el, 'dispatchEvent');
       button?.click();
       const calledWith = spy.calledWith(sinon.match.has('type', 'counterchange'));
-      expect(calledWith).toEqual(true);
+      assert.isTrue(calledWith);
     });
 
     test('counterchange event is dispatched - vi.fn', async () => {
@@ -85,10 +83,7 @@ suite('Lit Component testing', () => {
 
   suite('Override ', () => {
     beforeAll(async () => {
-      el = await fixture(
-        html`<counter-element heading="attribute heading">light-dom</counter-element>`,
-      );
-      await el.updateComplete;
+      el = await fixture(html`<counter-element heading="attribute heading"></counter-element>`);
       elShadowRoot = el?.shadowRoot;
     });
 
