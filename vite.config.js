@@ -34,11 +34,11 @@ export default defineConfig({
       include: ['**/src/**/*'],
     },
     browser: {
-      provider: 'webdriverio', // playwright
+      provider: 'playwright', //webdriverio
       enabled: true,
-      name: 'chrome', // chromium
+      name: 'chromium', //chrome
       providerOptions: {},
-      headless: false,
+      headless: true,
     },
   },
   plugins: [

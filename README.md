@@ -7,6 +7,8 @@ For more details on browser mode, visit the [Vitest guide](https://vitest.dev/gu
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/oscarmarina/lit-vitest-testing-comparison)
 
+
+![Stackblitz Vitest](stackblitz-vitest.png)
 <hr>
 
 #### Using Vitest Browser with WebdriverIO
