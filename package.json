@@ -13,7 +13,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "default": "./index.js"
+      "default": "./src/index.js"
     },
     "./package.json": {
       "default": "./package.json"
@@ -25,14 +25,14 @@
       "default": "./define/counter-element.js"
     },
     "./index.js": {
-      "default": "./index.js"
+      "default": "./src/index.js"
     },
     "./src/styles/counter-element-styles.css.js": {
       "default": "./src/styles/counter-element-styles.css.js"
     }
   },
-  "main": "index.js",
-  "module": "index.js",
+  "main": "src/index.js",
+  "module": "src/index.js",
   "files": [
     "/define/",
     "/src/",
@@ -44,14 +44,14 @@
     "build": "echo \"This is not a TypeScript project, so no need to build.\"",
     "dev:vite": "vite build",
     "format": "npm run format:eslint && npm run format:prettier && npm run format:stylelint",
-    "format:eslint": "eslint \"**/*.{js,ts,html}\" --fix --ignore-path .eslintignore",
-    "format:prettier": "prettier \"**/*.{js,ts,json,html}\" --write --ignore-path .eslintignore",
-    "format:stylelint": "stylelint \"**/*.{scss,css}\" --fix --allow-empty-input --ignore-path .eslintignore",
+    "format:eslint": "eslint . --fix",
+    "format:prettier": "prettier \"**/*.{js,ts,json,html}\" --write --ignore-path .prettierignore",
+    "format:stylelint": "stylelint \"**/*.{scss,css}\" --fix --allow-empty-input --ignore-path .prettierignore",
     "postinstall": "npm run sort:package",
     "lint": "npm run lint:eslint && npm run lint:prettier && npm run lint:stylelint",
-    "lint:eslint": "eslint \"**/*.{js,ts,html}\" --ignore-path .eslintignore",
-    "lint:prettier": "prettier \"**/*.{js,ts,json,html}\" --check --ignore-path .eslintignore",
-    "lint:stylelint": "stylelint \"**/*.{scss,css}\" --allow-empty-input --ignore-path .eslintignore",
+    "lint:eslint": "eslint .",
+    "lint:prettier": "prettier \"**/*.{js,ts,json,html}\" --check --ignore-path .prettierignore",
+    "lint:stylelint": "stylelint \"**/*.{scss,css}\" --allow-empty-input --ignore-path .prettierignore",
     "prepare": "husky install",
     "preview:vite": "vite preview",
     "sass:watch": "sass-style-template",
@@ -86,58 +86,6 @@
       }
     ]
   },
-  "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": "latest"
-    },
-    "extends": [
-      "@open-wc",
-      "prettier"
-    ],
-    "rules": {
-      "class-methods-use-this": "off",
-      "indent": [
-        "error",
-        2,
-        {
-          "SwitchCase": 1,
-          "ignoredNodes": [
-            "PropertyDefinition",
-            "TemplateLiteral > CallExpression"
-          ]
-        }
-      ],
-      "no-unused-expressions": [
-        "error",
-        {
-          "allowShortCircuit": true,
-          "allowTernary": true
-        }
-      ],
-      "object-curly-newline": "off",
-      "import/extensions": [
-        "error",
-        "always",
-        {
-          "ignorePackages": true
-        }
-      ],
-      "import/no-extraneous-dependencies": [
-        "error",
-        {
-          "devDependencies": [
-            "**/test/**/*.{js,ts}",
-            "**/*.config.{js,ts,mjs,cjs}",
-            "**/*.conf.{js,ts,mjs,cjs}"
-          ]
-        }
-      ],
-      "import/no-unresolved": "off",
-      "import/prefer-default-export": "off",
-      "lit/no-classfield-shadowing": "off",
-      "lit/no-native-attributes": "off"
-    }
-  },
   "stylelint": {
     "extends": "stylelint-config-standard-scss",
     "rules": {
@@ -148,38 +96,42 @@
     }
   },
   "dependencies": {
-    "@material/web": "^1.1.1",
-    "lit": "^3.1.1"
+    "@material/web": "^1.5.0",
+    "lit": "^3.1.4"
   },
   "devDependencies": {
     "@blockquote/cem-to-markdown-readme": "^1.0.0",
     "@blockquote/coverage-table-reporter": "^1.2.0",
     "@blockquote/rollup-plugin-externalize-source-dependencies": "^1.0.0",
     "@blockquote/rollup-plugin-total-bundlesize": "^2.1.2",
-    "@blockquote/sass-style-template": "^3.0.2",
-    "@custom-elements-manifest/analyzer": "^0.9.0",
+    "@blockquote/sass-style-template": "^3.0.3",
+    "@custom-elements-manifest/analyzer": "^0.10.2",
+    "@html-eslint/eslint-plugin": "^0.25.0",
+    "@html-eslint/parser": "^0.25.0",
     "@open-wc/eslint-config": "^12.0.3",
     "@open-wc/testing": "^4.0.0",
-    "@types/mocha": "^10.0.6",
-    "@vitest/browser": "^1.2.1",
-    "@vitest/coverage-istanbul": "^1.2.1",
+    "@types/mocha": "^10.0.7",
+    "@vitest/browser": "^1.6.0",
+    "@vitest/coverage-istanbul": "^1.6.0",
     "@vitest/ui": "latest",
-    "@wdio/cli": "^8.28.6",
-    "@web/rollup-plugin-html": "^2.1.2",
+    "@wdio/cli": "^8.39.0",
+    "@web/rollup-plugin-html": "^2.3.0",
     "concurrently": "^8.2.2",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^15.2.0",
-    "playwright": "^1.41.0",
-    "prettier": "^3.2.4",
-    "sinon": "^17.0.1",
-    "sort-package-json": "^2.6.0",
-    "stylelint": "^16.2.0",
-    "stylelint-config-standard-scss": "^13.0.0",
+    "globals": "^15.6.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
+    "playwright": "^1.44.1",
+    "prettier": "^3.3.2",
+    "sinon": "^18.0.0",
+    "sort-package-json": "^2.10.0",
+    "stylelint": "^16.6.1",
+    "stylelint-config-standard-scss": "^13.1.0",
     "ts-lit-plugin": "^2.0.2",
-    "vite": "^5.0.11",
-    "vitest": "^1.2.1"
+    "typescript-eslint": "^7.13.1",
+    "vite": "^5.3.1",
+    "vitest": "^1.6.0"
   },
   "publishConfig": {
     "access": "public"

@@ -8,7 +8,7 @@ import '../define/counter-element.js';
 
 suite('Lit Component testing', () => {
   /**
-   * @type {import('../index').CounterElement}
+   * @type {import('../src/index').CounterElement}
    */
   let el;
   let elShadowRoot;
