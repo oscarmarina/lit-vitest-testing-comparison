@@ -65,6 +65,10 @@ test('LIGHT DOM - Structure test', () => {
 
 For more details, refer to the [snapshots - semantic-dom-diff](https://open-wc.org/docs/testing/semantic-dom-diff/) documentation.
 
+**Covegare UI tab**
+
+- [Coverage UI tab issue](https://github.com/vitest-dev/vitest/issues/5013)
+
 <hr>
 
 #### Comparison between Web Test Runner and WebdriverIO
