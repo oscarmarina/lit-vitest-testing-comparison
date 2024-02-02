@@ -4,7 +4,7 @@
   "modules": [
     {
       "kind": "javascript-module",
-      "path": "src/CounterElement.js",
+      "path": "src/CounterElement.ts",
       "declarations": [
         {
           "kind": "class",
@@ -18,49 +18,48 @@
           ],
           "members": [
             {
-              "kind": "method",
-              "name": "#onClick"
-            },
-            {
-              "kind": "method",
-              "name": "sayHello",
-              "parameters": [
-                {
-                  "name": "heading",
-                  "description": "The heading to say \"Hello\" to",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ],
-              "description": "Formats a greeting",
-              "return": {
-                "type": {
-                  "text": "string"
-                }
-              }
-            },
-            {
               "kind": "field",
               "name": "heading",
-              "privacy": "public",
               "type": {
                 "text": "string"
               },
-              "description": "The heading to say \"Hello\" to.",
               "default": "'Hey there'",
+              "description": "The heading to say \"Hello\" to.",
               "attribute": "heading"
             },
             {
               "kind": "field",
               "name": "counter",
-              "privacy": "public",
               "type": {
                 "text": "number"
               },
-              "description": "The number of times the button has been clicked.",
               "default": "5",
+              "description": "The number of times the button has been clicked.",
               "attribute": "counter"
+            },
+            {
+              "kind": "method",
+              "name": "#onClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "sayHello",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "heading",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The heading to say \"Hello\" to"
+                }
+              ],
+              "description": "Formats a greeting"
             }
           ],
           "events": [
@@ -78,8 +77,8 @@
               "type": {
                 "text": "string"
               },
-              "description": "The heading to say \"Hello\" to.",
               "default": "'Hey there'",
+              "description": "The heading to say \"Hello\" to.",
               "fieldName": "heading"
             },
             {
@@ -87,8 +86,8 @@
               "type": {
                 "text": "number"
               },
-              "description": "The number of times the button has been clicked.",
               "default": "5",
+              "description": "The number of times the button has been clicked.",
               "fieldName": "counter"
             }
           ],
@@ -106,19 +105,19 @@
           "name": "CounterElement",
           "declaration": {
             "name": "CounterElement",
-            "module": "src/CounterElement.js"
+            "module": "src/CounterElement.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/styles/counter-element-styles.css.js",
+      "path": "src/styles/counter-element-styles.css.ts",
       "declarations": [
         {
           "kind": "variable",
           "name": "styles",
-          "default": "css`:host {\n  display: block;\n  box-sizing: border-box;\n}\n\n:host([hidden]),\n[hidden] {\n  display: none !important;\n}\n\n*,\n*::before,\n*::after {\n  box-sizing: inherit;\n}`"
+          "default": "css`:host { display: block; box-sizing: border-box; background-color: #fef7ff; padding: 1rem; } :host([hidden]), [hidden] { display: none !important; } *, *::before, *::after { box-sizing: inherit; } h1 { font-size: 1.5rem; margin: 0; } md-filled-button { display: inline-flex; margin: 0.5rem 0; font: inherit; }`"
         }
       ],
       "exports": [
@@ -127,14 +126,14 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/styles/counter-element-styles.css.js"
+            "module": "src/styles/counter-element-styles.css.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "define/counter-element.js",
+      "path": "define/counter-element.ts",
       "declarations": [],
       "exports": [
         {
@@ -143,21 +142,6 @@
           "declaration": {
             "name": "CounterElement",
             "module": "/src/CounterElement.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "index.js",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CounterElement",
-          "declaration": {
-            "name": "CounterElement",
-            "module": "./src/CounterElement.js"
           }
         }
       ]

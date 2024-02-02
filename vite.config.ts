@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 /* eslint-disable implicit-arrow-linebreak */
 import { defineConfig } from 'vite';
 import { rollupPluginHTML as pluginHtml } from '@web/rollup-plugin-html';
@@ -12,6 +14,9 @@ const outDir = process.env.OUTDIR || '.';
  */
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: ['lit', 'lit/decorators.js'],
+  },
   test: {
     onConsoleLog(log, type) {
       if (log.includes('in dev mode')) {
@@ -23,7 +28,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       reportsDirectory: `${outDir}/test/coverage/`,
-      reporter: ['lcov', 'json', 'text-summary', 'html'],
+      reporter: ['lcov', 'json', 'text-summary'],
       enabled: true,
       thresholds: {
         statements: 80,
@@ -34,11 +39,10 @@ export default defineConfig({
       include: ['**/src/**/*'],
     },
     browser: {
-      provider: 'webdriverio', // playwright
+      provider: 'playwright',
       enabled: true,
-      name: 'chrome', // chromium
-      providerOptions: {},
-      headless: false,
+      name: 'chromium',
+      headless: true,
     },
   },
   plugins: [

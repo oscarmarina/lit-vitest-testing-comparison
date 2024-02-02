@@ -3,10 +3,12 @@
 This guide provides instructions on how to test a Lit component using Vitest in browser mode.
 For more details on browser mode, visit the [Vitest guide](https://vitest.dev/guide/browser.html#browser-mode-experimental).
 
+
 <br>
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/oscarmarina/lit-vitest-testing-comparison)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz_small.svg)](https://stackblitz.com/github/oscarmarina/lit-vitest-testing-comparison/tree/feature/typescript)
 
+<hr>
 
 ![Stackblitz Vitest](stackblitz-vitest.png)
 <hr>
