@@ -4,7 +4,7 @@
  * @param {string} cnode - The string to remove comment nodes from.
  * @returns {string} The string with all comment nodes removed.
  */
-const removeComments = cnode => (cnode || '').replace(/<!--[\s\S]*?-->/g, '');
+const removeComments = (cnode: string): string => (cnode || '').replace(/<!--[\s\S]*?-->/g, '');
 
 /**
  * Removes all HTML comment nodes from a string and formats the string to be on one line.
@@ -12,7 +12,8 @@ const removeComments = cnode => (cnode || '').replace(/<!--[\s\S]*?-->/g, '');
  * @param {string} cnode - The string to remove comment nodes from and format.
  * @returns {string} The string with all comment nodes removed and formatted to be on one line.
  */
-const removeCommentsAndFormat = cnode => removeComments(cnode).replace(/\s\s+/g, '');
+const removeCommentsAndFormat = (cnode: string): string =>
+  removeComments(cnode).replace(/\s\s+/g, '');
 
 /**
  * Returns the outerHTML or innerHTML of a node after removing specified attributes from it and its children.
@@ -20,30 +21,28 @@ const removeCommentsAndFormat = cnode => removeComments(cnode).replace(/\s\s+/g,
  * If the initial node is an HTMLElement, the function returns the outerHTML of the node.
  * If the initial node is a ShadowRoot, the function returns the innerHTML of the node.
  *
- * @param {Node} node - The initial node.
+ * @param {HTMLElement | ShadowRoot } node - The initial node.
  * @param {string[]} ignoreAttributes - The attributes to remove from the node and its children.
  * @returns {string} The outerHTML or innerHTML of the node after removing the specified attributes.
  */
-export const structureSnapshot = (node, ignoreAttributes = []) => {
-  const initialNodeIsHTMLElement = node instanceof HTMLElement;
-  const initialNodeIsShadowRoot = node instanceof ShadowRoot;
+export const structureSnapshot = (
+  node: HTMLElement | ShadowRoot,
+  ignoreAttributes: string[] = [],
+): string => {
+  const initialNodeIsHTMLElement: boolean = node instanceof HTMLElement;
+  const initialNodeIsShadowRoot: boolean = node instanceof ShadowRoot;
 
   /**
    * Removes specified attributes from an HTML node and its children.
    * @param {Node} currentNode - The node to remove the attributes from.
    */
-  const removeAttributes = currentNode => {
+  const removeAttributes = (currentNode: Node): void => {
     if (currentNode && ignoreAttributes && Array.isArray(ignoreAttributes)) {
-      if (
-        currentNode instanceof HTMLElement &&
-        currentNode.nodeType !== 3 &&
-        currentNode.nodeType !== 8
-      ) {
-        ignoreAttributes.forEach(attr => currentNode.removeAttribute(attr));
+      if (currentNode instanceof HTMLElement) {
+        ignoreAttributes.forEach((attr: string) => currentNode.removeAttribute(attr));
       }
-
       // Look for HTMLElements in its children.
-      Array.from(currentNode.childNodes).forEach(child => removeAttributes(child));
+      Array.from(currentNode.childNodes).forEach((child: Node) => removeAttributes(child));
     }
   };
 
@@ -51,11 +50,11 @@ export const structureSnapshot = (node, ignoreAttributes = []) => {
 
   // If the initial node is an HTMLElement, return the outerHTML after removing comments and formatting.
   // If the initial node is a ShadowRoot, return the innerHTML after removing comments and formatting.
-  let result = '';
+  let result: string = '';
   if (initialNodeIsHTMLElement) {
-    result = removeCommentsAndFormat(node ? node.outerHTML : '');
+    result = removeCommentsAndFormat(node ? (node as HTMLElement).outerHTML : '');
   } else if (initialNodeIsShadowRoot) {
-    result = removeCommentsAndFormat(node ? node.innerHTML : '');
+    result = removeCommentsAndFormat(node ? (node as ShadowRoot).innerHTML : '');
   }
 
   return result;

@@ -34,7 +34,7 @@ storybook-static
 ## end gitignore
 
 ## specific eslintignore
-*.config.js
+*.config.*
 package-lock.json
 *.min.js
 *-styles.*
