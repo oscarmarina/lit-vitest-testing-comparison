@@ -23,11 +23,11 @@
 
       const heading = 'World!';
       render(
-        html`<counter-element
-          @counterchange="${ev => console.log('==>', ev.detail)}"
-          .heading=${heading}
-          >some light-dom</counter-element
-        >`,
+        html`
+          <counter-element @counterchange="${ev => console.log('==>', ev.detail)}" .heading=${heading}>
+            some light-dom
+          </counter-element>
+        `,
         document.querySelector('#demo'),
       );
     </script>

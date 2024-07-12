@@ -1,10 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { beforeAll, afterAll, suite, expect, vi, test, assert } from 'vitest';
 import { assert as a11y, fixture, fixtureCleanup, html } from '@open-wc/testing';
+import { userEvent } from '@vitest/browser/context';
 // import { $ } from '@wdio/globals';
 import sinon from 'sinon';
 import { structureSnapshot } from './utils.js';
 import '../define/counter-element.js';
+
+// https://vitest.dev/guide/browser/context.html#context
 
 suite('Lit Component testing', () => {
   /**
@@ -16,7 +19,9 @@ suite('Lit Component testing', () => {
 
   suite('Default', () => {
     beforeAll(async () => {
-      el = await fixture(html`<counter-element>light-dom</counter-element>`);
+      el = await fixture(html`
+        <counter-element>light-dom</counter-element>
+      `);
       elShadowRoot = el?.shadowRoot;
       // el$ = await $('counter-element');
     });
@@ -45,7 +50,9 @@ suite('Lit Component testing', () => {
 
   suite('Events ', () => {
     beforeAll(async () => {
-      el = await fixture(html`<counter-element>light-dom</counter-element>`);
+      el = await fixture(html`
+        <counter-element>light-dom</counter-element>
+      `);
       elShadowRoot = el?.shadowRoot;
     });
 
@@ -56,17 +63,17 @@ suite('Lit Component testing', () => {
     test('should increment value on click', async () => {
       const button = elShadowRoot.querySelector('md-filled-button');
       expect(button?.textContent).toContain('Counter: 5');
-      button?.click();
+      await userEvent.click(button);
       await el.updateComplete;
-      button?.click();
+      await userEvent.click(button);
       await el.updateComplete;
       expect(button?.textContent).toContain('Counter: 7');
     });
 
-    test('counterchange event is dispatched - sinon', () => {
+    test('counterchange event is dispatched - sinon', async () => {
       const button = elShadowRoot.querySelector('md-filled-button');
       const spy = sinon.spy(el, 'dispatchEvent');
-      button?.click();
+      await userEvent.click(button);
       const calledWith = spy.calledWith(sinon.match.has('type', 'counterchange'));
       assert.isTrue(calledWith);
     });
@@ -75,7 +82,7 @@ suite('Lit Component testing', () => {
       const spyClick = vi.fn();
       const button = elShadowRoot.querySelector('md-filled-button');
       el?.addEventListener('counterchange', spyClick);
-      button?.click();
+      await userEvent.click(button);
       await el.updateComplete;
       expect(spyClick).toHaveBeenCalled();
     });
@@ -83,7 +90,9 @@ suite('Lit Component testing', () => {
 
   suite('Override ', () => {
     beforeAll(async () => {
-      el = await fixture(html`<counter-element heading="attribute heading"></counter-element>`);
+      el = await fixture(html`
+        <counter-element heading="attribute heading"></counter-element>
+      `);
       elShadowRoot = el?.shadowRoot;
     });
 

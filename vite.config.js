@@ -18,7 +18,6 @@ export default defineConfig({
         return false;
       }
     },
-    ui: false,
     include: ['test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     coverage: {
       provider: 'istanbul',
@@ -38,7 +37,7 @@ export default defineConfig({
       enabled: true,
       name: 'chromium', //chrome
       providerOptions: {},
-      headless: true,
+      headless: false,
     },
   },
   plugins: [

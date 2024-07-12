@@ -45,7 +45,10 @@ export class CounterElement extends LitElement {
    */
   render() {
     return html`
-      <h1>${this.sayHello(this.heading)}<span>!</span></h1>
+      <h1>
+        ${this.sayHello(this.heading)}
+        <span>!</span>
+      </h1>
       <md-filled-button @click=${this.#onClick}>Counter: ${this.counter}</md-filled-button>
       <hr />
       <slot></slot>
