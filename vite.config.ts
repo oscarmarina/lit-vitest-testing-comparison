@@ -23,12 +23,11 @@ export default defineConfig({
         return false;
       }
     },
-    ui: false,
     include: ['test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     coverage: {
       provider: 'istanbul',
       reportsDirectory: `${outDir}/test/coverage/`,
-      reporter: ['lcov', 'json', 'text-summary'],
+      reporter: ['lcov', 'json', 'text-summary', 'html'],
       enabled: true,
       thresholds: {
         statements: 80,
@@ -42,7 +41,7 @@ export default defineConfig({
       provider: 'playwright',
       enabled: true,
       name: 'chromium',
-      headless: true,
+      headless: false,
     },
   },
   plugins: [

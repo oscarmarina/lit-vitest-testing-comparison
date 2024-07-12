@@ -36,5 +36,5 @@
     ],
     "types": ["mocha"]
   },
-  "include": ["src/**/*.ts", "define/**/*.ts", "./index.ts"]
+  "include": ["src/**/*.ts", "define/**/*.ts"]
 }
