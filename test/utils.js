@@ -34,11 +34,7 @@ export const structureSnapshot = (node, ignoreAttributes = []) => {
    */
   const removeAttributes = currentNode => {
     if (currentNode && ignoreAttributes && Array.isArray(ignoreAttributes)) {
-      if (
-        currentNode instanceof HTMLElement &&
-        currentNode.nodeType !== 3 &&
-        currentNode.nodeType !== 8
-      ) {
+      if (currentNode instanceof HTMLElement && currentNode.nodeType !== 3 && currentNode.nodeType !== 8) {
         ignoreAttributes.forEach(attr => currentNode.removeAttribute(attr));
       }
 
