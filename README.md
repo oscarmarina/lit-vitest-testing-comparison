@@ -1,31 +1,31 @@
-# Testing Lit with Vitest - Browser Mode
+# Testing Lit with Vitest Browser and Playwright
 
-This guide provides instructions on how to test a Lit component using Vitest in browser mode.
-For more details on browser mode, visit the [Vitest guide](https://vitest.dev/guide/browser.html#browser-mode-experimental).
+## Introduction
 
+This guide aims to outline the process of migrating from using Web Test Runner to Vitest Browser for testing web components created with Lit. For more details on browser mode, visit the [Vitest guide](https://vitest.dev/guide/browser.html#browser-mode-experimental).
 
-<br>
+This change arises from a curiosity to explore what the more popular and widely adopted options in the open-source world have to offer, such as Vite and now Vitest.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz_small.svg)](https://stackblitz.com/github/oscarmarina/lit-vitest-testing-comparison/tree/feature/typescript)
+It's interesting to see how this 2.0 version of Vitest Browser draws inspiration from many other tools, including Web Test Runner itself.
+
+- [Vitest Browser - Discussions](https://github.com/vitest-dev/vitest/discussions/5828)
+- [Vitest Browser - Context module](https://github.com/vitest-dev/vitest/pull/5097)
+
+> Although Vitest uses WebDriverIO by default, I have a strong **feeling** that the combination of **Playwright & Vitest** works very well together.
 
 <hr>
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/oscarmarina/lit-vitest-testing-comparison/tree/feature/typescript)
+
+**StackBlitz: open another terminal window and type the command `npm run test`.**
 
 ![Stackblitz Vitest](stackblitz-vitest.png)
+
 <hr>
-
-#### Using Vitest Browser with WebdriverIO
-
-- [Vitest browser using WebdriverIO by default](https://vitest.dev/guide/browser.html#browser-option-types)
 
 #### Using Chai A11y aXe and rollup-plugin-externalize-source-dependencies
 
-Please note that [axe-core/webdriverio](https://www.npmjs.com/package/@axe-core/webdriverio) is currently incompatible with Vite.
-
-```bash
-   Error: Module "url" has been externalized for browser compatibility. Cannot access "url.pathToFileURL" in client code. See [Vite Troubleshooting Guide](https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility) for more details.
-```
-
-The [Chai A11y aXe - open-wc](https://open-wc.org/docs/testing/chai-a11y-axe/#testing-chai-a11y-axe) testing library can be used with WebdriverIO.
+The [Chai A11y aXe - open-wc](https://open-wc.org/docs/testing/chai-a11y-axe/#testing-chai-a11y-axe) testing library can be used with Vitest.
 
 ```js
 test('a11y', async () => {
@@ -54,6 +54,14 @@ export default {
 };
 ```
 
+<hr>
+
+Please note that [axe-core/webdriverio](https://webdriver.io/es/docs/accessibility-testing/axe-core/) is currently incompatible with Vite.
+
+```bash
+   Error: Module "url" has been externalized for browser compatibility. Cannot access "url.pathToFileURL" in client code. See [Vite Troubleshooting Guide](https://vitejs.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility) for more details.
+```
+
 #### Using Vitest Snapshots with Semantic-DOM-Diff
 
 `Vitest` also supports [snapshot testing](https://vitest.dev/guide/snapshot.html#use-snapshots)
@@ -69,15 +77,9 @@ test('LIGHT DOM - Structure test', () => {
 
 For more details, refer to the [snapshots - semantic-dom-diff](https://open-wc.org/docs/testing/semantic-dom-diff/) documentation.
 
-**Covegare UI tab**
+**Covegare UI**
 
-- [Coverage UI tab issue](https://github.com/vitest-dev/vitest/issues/5013)
-
-<hr>
-
-#### Comparison between Web Test Runner and WebdriverIO
-
-- [lit-testing-comparison](https://github.com/oscarmarina/lit-testing-comparison)
+![Stackblitz Vitest Coverage](stackblitz-vitest-coverage.png)
 
 <hr>
 

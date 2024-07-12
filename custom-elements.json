@@ -112,6 +112,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CounterElement",
+          "declaration": {
+            "name": "CounterElement",
+            "module": "./CounterElement.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/styles/counter-element-styles.css.ts",
       "declarations": [
         {

@@ -12,8 +12,7 @@ const removeComments = (cnode: string): string => (cnode || '').replace(/<!--[\s
  * @param {string} cnode - The string to remove comment nodes from and format.
  * @returns {string} The string with all comment nodes removed and formatted to be on one line.
  */
-const removeCommentsAndFormat = (cnode: string): string =>
-  removeComments(cnode).replace(/\s\s+/g, '');
+const removeCommentsAndFormat = (cnode: string): string => removeComments(cnode).replace(/\s\s+/g, '');
 
 /**
  * Returns the outerHTML or innerHTML of a node after removing specified attributes from it and its children.
@@ -50,7 +49,7 @@ export const structureSnapshot = (
 
   // If the initial node is an HTMLElement, return the outerHTML after removing comments and formatting.
   // If the initial node is a ShadowRoot, return the innerHTML after removing comments and formatting.
-  let result: string = '';
+  let result = '';
   if (initialNodeIsHTMLElement) {
     result = removeCommentsAndFormat(node ? (node as HTMLElement).outerHTML : '');
   } else if (initialNodeIsShadowRoot) {
