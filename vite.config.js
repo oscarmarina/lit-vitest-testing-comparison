@@ -36,7 +36,11 @@ export default defineConfig({
       provider: 'playwright', //webdriverio
       enabled: true,
       name: 'chromium', //chrome
-      providerOptions: {},
+      providerOptions: {
+        launch: {
+          devtools: true,
+        }
+      },
       headless: false,
     },
   },
