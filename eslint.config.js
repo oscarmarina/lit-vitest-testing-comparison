@@ -70,6 +70,7 @@ export default [
       '**/*.d.ts',
       '**/storybook-static',
       '**/*.config.*',
+      '**/*.workspace.*',
       '**/*.min.js',
       '**/*-styles.*',
     ],

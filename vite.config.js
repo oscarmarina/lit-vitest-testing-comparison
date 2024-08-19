@@ -1,4 +1,3 @@
-/* eslint-disable implicit-arrow-linebreak */
 import { defineConfig } from 'vite';
 import { rollupPluginHTML as pluginHtml } from '@web/rollup-plugin-html';
 import totalBundlesize from '@blockquote/rollup-plugin-total-bundlesize';
@@ -33,13 +32,13 @@ export default defineConfig({
       include: ['**/src/**/*'],
     },
     browser: {
-      provider: 'playwright', //webdriverio
+      provider: 'playwright', // webdriverio
       enabled: true,
-      name: 'chromium', //chrome
+      name: '', // chrome
       providerOptions: {
         launch: {
           devtools: true,
-        }
+        },
       },
       headless: false,
     },
