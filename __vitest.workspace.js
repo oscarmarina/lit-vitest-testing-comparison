@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { defineWorkspace } from 'vitest/config';
 
 export default defineWorkspace([
@@ -17,6 +16,7 @@ export default defineWorkspace([
       name: 'Webkit',
       browser: {
         name: 'webkit',
+        headless: true,
       },
     },
   },

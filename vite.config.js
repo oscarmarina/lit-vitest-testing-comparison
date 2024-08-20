@@ -19,7 +19,7 @@ export default defineConfig({
     },
     include: ['test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       reportsDirectory: `${outDir}/test/coverage/`,
       reporter: ['lcov', 'json', 'text-summary', 'html'],
       enabled: true,
@@ -30,16 +30,12 @@ export default defineConfig({
         lines: 80,
       },
       include: ['**/src/**/*'],
+      exclude: ['**/src/**/index.*', '**/src/styles/'],
     },
     browser: {
-      provider: 'playwright', // webdriverio
+      provider: 'playwright',
       enabled: true,
-      name: '', // chrome
-      providerOptions: {
-        launch: {
-          devtools: true,
-        },
-      },
+      name: 'chromium',
       headless: false,
     },
   },

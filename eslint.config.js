@@ -1,11 +1,9 @@
 import tseslint from 'typescript-eslint';
 import html from '@html-eslint/eslint-plugin';
-import globals from 'globals';
-// import htmlParser from '@html-eslint/parser';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
+import { fileURLToPath } from 'node:url';
 import { FlatCompat } from '@eslint/eslintrc';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,9 +15,7 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-const htmlFilesConfig = [
-  html.configs['flat/recommended']
-].map(conf => ({
+const htmlFilesConfig = [html.configs['flat/recommended']].map(conf => ({
   ...conf,
   files: ['**/*.html'],
 }));
@@ -30,13 +26,11 @@ const htmlFilesRules = {
     '@html-eslint/indent': ['error', 2],
     '@html-eslint/require-closing-tags': 'off',
     '@html-eslint/no-extra-spacing-attrs': 'off',
+    '@html-eslint/attrs-newline': 'off',
   },
 };
 
-const tsFilesConfig = [
-  ...tseslint.configs.strict,
-  ...tseslint.configs.stylistic,
-].map(conf => ({
+const tsFilesConfig = [...tseslint.configs.strict, ...tseslint.configs.stylistic].map(conf => ({
   ...conf,
   files: ['**/*.ts'],
 }));
@@ -57,7 +51,6 @@ export default [
     ignores: [
       '**/.idea',
       '**/.vscode',
-      '**/.code-workspace',
       '**/coverage',
       '**/reports',
       '**/__snapshots__',
@@ -85,9 +78,6 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-      globals: {
-        ...globals.browser
-      }
     },
     rules: {
       'class-methods-use-this': 'off',
@@ -129,6 +119,14 @@ export default [
       'lit/no-classfield-shadowing': 'off',
       'lit/no-native-attributes': 'off',
       'lit-a11y/click-events-have-key-events': 'off',
+      'lit-a11y/no-autofocus': 'off',
+    },
+  },
+  {
+    files: ['**/*.test.*'],
+    rules: {
+      'no-unused-expressions': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
 ];
