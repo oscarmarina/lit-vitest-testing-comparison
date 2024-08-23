@@ -1,6 +1,6 @@
-import { html, LitElement } from 'lit';
-import { property } from 'lit/decorators.js';
-import { styles } from './styles/counter-element-styles.css.js';
+import {html, LitElement} from 'lit';
+import {property} from 'lit/decorators.js';
+import {styles} from './styles/counter-element-styles.css.js';
 import '@material/web/button/filled-button.js';
 
 /**
@@ -20,13 +20,13 @@ export class CounterElement extends LitElement {
   /**
    * The heading to say "Hello" to.
    */
-  @property({ type: String })
+  @property({type: String})
   heading = 'Hey there';
 
   /**
    * The number of times the button has been clicked.
    */
-  @property({ type: Number })
+  @property({type: Number})
   counter = 5;
 
   override render() {
@@ -40,7 +40,7 @@ export class CounterElement extends LitElement {
 
   #onClick() {
     this.counter += 1;
-    this.dispatchEvent(new CustomEvent('counterchange', { detail: this.counter }));
+    this.dispatchEvent(new CustomEvent('counterchange', {detail: this.counter}));
   }
 
   /**

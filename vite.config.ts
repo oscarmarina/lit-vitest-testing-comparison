@@ -14,9 +14,6 @@ const outDir = process.env.OUTDIR || '.';
  */
 
 export default defineConfig({
-  optimizeDeps: {
-    exclude: ['lit', 'lit/decorators.js'],
-  },
   test: {
     onConsoleLog(log, type) {
       if (log.includes('in dev mode')) {
@@ -25,7 +22,7 @@ export default defineConfig({
     },
     include: ['test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       reportsDirectory: `${outDir}/test/coverage/`,
       reporter: ['lcov', 'json', 'text-summary', 'html'],
       enabled: true,
@@ -36,6 +33,7 @@ export default defineConfig({
         lines: 80,
       },
       include: ['**/src/**/*'],
+      exclude: ['**/src/**/index.*', '**/src/styles/'],
     },
     browser: {
       provider: 'playwright',

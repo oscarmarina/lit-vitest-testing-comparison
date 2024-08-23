@@ -1,10 +1,9 @@
 import tseslint from 'typescript-eslint';
 import html from '@html-eslint/eslint-plugin';
-// import htmlParser from '@html-eslint/parser';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
+import { fileURLToPath } from 'node:url';
 import { FlatCompat } from '@eslint/eslintrc';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -52,7 +51,6 @@ export default [
     ignores: [
       '**/.idea',
       '**/.vscode',
-      '**/.code-workspace',
       '**/coverage',
       '**/reports',
       '**/__snapshots__',
@@ -65,6 +63,7 @@ export default [
       '**/*.d.ts',
       '**/storybook-static',
       '**/*.config.*',
+      '**/*.workspace.*',
       '**/*.min.js',
       '**/*-styles.*',
     ],
@@ -120,6 +119,14 @@ export default [
       'lit/no-classfield-shadowing': 'off',
       'lit/no-native-attributes': 'off',
       'lit-a11y/click-events-have-key-events': 'off',
+      'lit-a11y/no-autofocus': 'off',
+    },
+  },
+  {
+    files: ['**/*.test.*'],
+    rules: {
+      'no-unused-expressions': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
 ];

@@ -1,13 +1,14 @@
-import { beforeAll, afterAll, suite, expect, vi, test, assert } from 'vitest';
-import { assert as a11y, fixture, fixtureCleanup } from '@open-wc/testing';
-import { html } from 'lit/static-html.js';
+import {beforeAll, afterAll, suite, expect, vi, test, assert} from 'vitest';
+import {assert as a11y, fixture, fixtureCleanup} from '@open-wc/testing';
+import {html} from 'lit/static-html.js';
 import sinon from 'sinon';
-import { userEvent } from '@vitest/browser/context';
-import { structureSnapshot } from './utils.js';
-import { CounterElement } from '../src/CounterElement.js';
+import {userEvent} from '@vitest/browser/context';
+import {structureSnapshot} from './utils.js';
+import {CounterElement} from '../src/CounterElement.js';
 import '../define/counter-element.js';
 
 // https://vitest.dev/guide/browser/context.html#context
+// https://main.vitest.dev/guide/browser/locators.html
 
 suite('Lit Component testing', () => {
   let el: CounterElement;
@@ -19,7 +20,6 @@ suite('Lit Component testing', () => {
         <counter-element>light-dom</counter-element>
       `);
       elShadowRoot = el.shadowRoot!;
-      // el$ = await $('counter-element');
     });
 
     afterAll(() => {

@@ -26,5 +26,8 @@
 **/.tmp
 **/*.tgz
 **/*.tsbuildinfo
+**/*.wireit
 **/storybook-static
+**/*storybook.log
+**/gh-pages/
 ## end gitignore

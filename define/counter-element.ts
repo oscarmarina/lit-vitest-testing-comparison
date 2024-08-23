@@ -1,3 +1,3 @@
-import { CounterElement } from '../src/CounterElement.js';
+import {CounterElement} from '../src/CounterElement.js';
 
 window.customElements.define('counter-element', CounterElement);
