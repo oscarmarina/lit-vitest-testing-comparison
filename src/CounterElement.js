@@ -1,6 +1,6 @@
-import { html, LitElement } from 'lit';
+import {html, LitElement} from 'lit';
 import '@material/web/button/filled-button.js';
-import { styles } from './styles/counter-element-styles.css.js';
+import {styles} from './styles/counter-element-styles.css.js';
 
 /**
  * ![Lit](https://img.shields.io/badge/lit-3.0.0-blue.svg)
@@ -26,12 +26,12 @@ export class CounterElement extends LitElement {
     /**
      * The heading to say "Hello" to.
      */
-    heading: { type: String },
+    heading: {type: String},
 
     /**
      * The number of times the button has been clicked.
      */
-    counter: { type: Number },
+    counter: {type: Number},
   };
 
   constructor() {
@@ -57,7 +57,7 @@ export class CounterElement extends LitElement {
 
   #onClick() {
     this.counter += 1;
-    this.dispatchEvent(new CustomEvent('counterchange', { detail: this.counter }));
+    this.dispatchEvent(new CustomEvent('counterchange', {detail: this.counter}));
   }
 
   /**

@@ -4,7 +4,7 @@
  * @param {string} cnode - The string to remove comment nodes from.
  * @returns {string} The string with all comment nodes removed.
  */
-const removeComments = cnode => (cnode || '').replace(/<!--[\s\S]*?-->/g, '');
+const removeComments = (cnode) => (cnode || '').replace(/<!--[\s\S]*?-->/g, '');
 
 /**
  * Removes all HTML comment nodes from a string and formats the string to be on one line.
@@ -12,7 +12,7 @@ const removeComments = cnode => (cnode || '').replace(/<!--[\s\S]*?-->/g, '');
  * @param {string} cnode - The string to remove comment nodes from and format.
  * @returns {string} The string with all comment nodes removed and formatted to be on one line.
  */
-const removeCommentsAndFormat = cnode => removeComments(cnode).replace(/\s\s+/g, '');
+const removeCommentsAndFormat = (cnode) => removeComments(cnode).replace(/\s\s+/g, '');
 
 /**
  * Returns the outerHTML or innerHTML of a node after removing specified attributes from it and its children.
@@ -32,14 +32,18 @@ export const structureSnapshot = (node, ignoreAttributes = []) => {
    * Removes specified attributes from an HTML node and its children.
    * @param {Node} currentNode - The node to remove the attributes from.
    */
-  const removeAttributes = currentNode => {
+  const removeAttributes = (currentNode) => {
     if (currentNode && ignoreAttributes && Array.isArray(ignoreAttributes)) {
-      if (currentNode instanceof HTMLElement && currentNode.nodeType !== 3 && currentNode.nodeType !== 8) {
-        ignoreAttributes.forEach(attr => currentNode.removeAttribute(attr));
+      if (
+        currentNode instanceof HTMLElement &&
+        currentNode.nodeType !== 3 &&
+        currentNode.nodeType !== 8
+      ) {
+        ignoreAttributes.forEach((attr) => currentNode.removeAttribute(attr));
       }
 
       // Look for HTMLElements in its children.
-      Array.from(currentNode.childNodes).forEach(child => removeAttributes(child));
+      Array.from(currentNode.childNodes).forEach((child) => removeAttributes(child));
     }
   };
 

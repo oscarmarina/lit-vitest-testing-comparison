@@ -72,12 +72,12 @@
     ]
   },
   "prettier": {
-    "arrowParens": "avoid",
     "bracketSameLine": true,
+    "bracketSpacing": false,
     "htmlWhitespaceSensitivity": "ignore",
-    "printWidth": 108,
+    "printWidth": 100,
     "singleQuote": true,
-    "trailingComma": "all",
+    "trailingComma": "es5",
     "overrides": [
       {
         "files": "*.{scss,css}",

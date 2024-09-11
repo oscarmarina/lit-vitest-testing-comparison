@@ -19,17 +19,19 @@
     <div id="demo"></div>
 
     <script type="module">
-      import { html, render } from 'lit';
+      import {html, render} from 'lit';
       import '../define/counter-element.js';
 
       const heading = 'World!';
       render(
         html`
-          <counter-element @counterchange="${ev => console.log('==>', ev.detail)}" .heading=${heading}>
+          <counter-element
+            @counterchange="${(ev) => console.log('==>', ev.detail)}"
+            .heading=${heading}>
             some light-dom
           </counter-element>
         `,
-        document.querySelector('#demo'),
+        document.querySelector('#demo')
       );
     </script>
   </body>

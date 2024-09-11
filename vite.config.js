@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import { rollupPluginHTML as pluginHtml } from '@web/rollup-plugin-html';
+import {defineConfig} from 'vite';
+import {rollupPluginHTML as pluginHtml} from '@web/rollup-plugin-html';
 import totalBundlesize from '@blockquote/rollup-plugin-total-bundlesize';
 import externalizeSourceDependencies from '@blockquote/rollup-plugin-externalize-source-dependencies';
 

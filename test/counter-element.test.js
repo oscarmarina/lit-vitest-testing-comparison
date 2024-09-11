@@ -1,8 +1,8 @@
-import { beforeEach, afterEach, describe, expect, vi, test } from 'vitest';
-import { assert as a11y, fixture, fixtureCleanup, html } from '@open-wc/testing';
-import { page, userEvent } from '@vitest/browser/context';
+import {beforeEach, afterEach, describe, expect, vi, test} from 'vitest';
+import {assert as a11y, fixture, fixtureCleanup, html} from '@open-wc/testing';
+import {page, userEvent} from '@vitest/browser/context';
 import sinon from 'sinon';
-import { structureSnapshot } from './utils.js';
+import {structureSnapshot} from './utils.js';
 import '../define/counter-element.js';
 
 // https://vitest.dev/guide/browser/context.html#context
