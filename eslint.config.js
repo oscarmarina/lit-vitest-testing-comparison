@@ -116,14 +116,15 @@ export default [
       ],
       'import/no-unresolved': 'off',
       'import/prefer-default-export': 'off',
-      'lit/no-classfield-shadowing': 'off',
       'lit/no-native-attributes': 'off',
+      'lit/no-useless-template-literals': 'off',
+      'lit-a11y/anchor-is-valid': 'off',
       'lit-a11y/click-events-have-key-events': 'off',
       'lit-a11y/no-autofocus': 'off',
     },
   },
   {
-    files: ['**/*.test.*'],
+    files: ['**/test/**/*.{js,ts}'],
     rules: {
       'no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',

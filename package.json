@@ -1,7 +1,7 @@
 {
   "name": "@blockquote-playground/counter-element",
   "version": "1.0.0-rc.1",
-  "description": "Webcomponent counter-element following open-wc recommendations",
+  "description": "lit-vitest-testing-comparison",
   "keywords": [
     "lit",
     "web-component",
