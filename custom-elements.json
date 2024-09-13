@@ -19,7 +19,8 @@
           "members": [
             {
               "kind": "method",
-              "name": "#onClick"
+              "name": "#onClick",
+              "privacy": "private"
             },
             {
               "kind": "method",
@@ -113,12 +114,27 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/index.js",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CounterElement",
+          "declaration": {
+            "name": "CounterElement",
+            "module": "./CounterElement.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/styles/counter-element-styles.css.js",
       "declarations": [
         {
           "kind": "variable",
           "name": "styles",
-          "default": "css`:host {\n  display: block;\n  box-sizing: border-box;\n}\n\n:host([hidden]),\n[hidden] {\n  display: none !important;\n}\n\n*,\n*::before,\n*::after {\n  box-sizing: inherit;\n}`"
+          "default": "css`:host { display: block; box-sizing: border-box; background-color: #fef7ff; padding: 1rem; } :host([hidden]), [hidden] { display: none !important; } *, *::before, *::after { box-sizing: inherit; } h1 { font-size: 1.5rem; margin: 0; } md-filled-button { display: inline-flex; margin: 0.5rem 0; font: inherit; }`"
         }
       ],
       "exports": [
@@ -143,21 +159,6 @@
           "declaration": {
             "name": "CounterElement",
             "module": "/src/CounterElement.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "index.js",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "CounterElement",
-          "declaration": {
-            "name": "CounterElement",
-            "module": "./src/CounterElement.js"
           }
         }
       ]

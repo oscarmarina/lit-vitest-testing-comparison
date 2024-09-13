@@ -33,10 +33,11 @@ export default defineConfig({
       exclude: ['**/src/**/index.*', '**/src/styles/'],
     },
     browser: {
-      provider: 'playwright',
       enabled: true,
-      name: 'chromium',
       headless: false,
+      name: 'chromium',
+      provider: 'playwright',
+      viewport: {width: 1920, height: 1080},
     },
   },
   plugins: [

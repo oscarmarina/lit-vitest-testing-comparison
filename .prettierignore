@@ -24,6 +24,7 @@
 **/dev
 **/build
 **/.tmp
+**/.wireit
 **/*.tgz
 **/*.tsbuildinfo
 **/storybook-static
