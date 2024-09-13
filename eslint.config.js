@@ -3,8 +3,8 @@ import html from '@html-eslint/eslint-plugin';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import path from 'node:path';
 import js from '@eslint/js';
-import { fileURLToPath } from 'node:url';
-import { FlatCompat } from '@eslint/eslintrc';
+import {fileURLToPath} from 'node:url';
+import {FlatCompat} from '@eslint/eslintrc';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,7 +15,7 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-const htmlFilesConfig = [html.configs['flat/recommended']].map(conf => ({
+const htmlFilesConfig = [html.configs['flat/recommended']].map((conf) => ({
   ...conf,
   files: ['**/*.html'],
 }));
@@ -30,7 +30,7 @@ const htmlFilesRules = {
   },
 };
 
-const tsFilesConfig = [...tseslint.configs.strict, ...tseslint.configs.stylistic].map(conf => ({
+const tsFilesConfig = [...tseslint.configs.strict, ...tseslint.configs.stylistic].map((conf) => ({
   ...conf,
   files: ['**/*.ts'],
 }));
@@ -60,6 +60,7 @@ export default [
       '**/dev',
       '**/build',
       '**/.tmp',
+      '**/.wireit',
       '**/*.d.ts',
       '**/storybook-static',
       '**/*.config.*',

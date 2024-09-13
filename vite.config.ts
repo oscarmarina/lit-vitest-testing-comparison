@@ -1,8 +1,7 @@
 /// <reference types="vitest" />
 
-/* eslint-disable implicit-arrow-linebreak */
-import { defineConfig } from 'vite';
-import { rollupPluginHTML as pluginHtml } from '@web/rollup-plugin-html';
+import {defineConfig} from 'vite';
+import {rollupPluginHTML as pluginHtml} from '@web/rollup-plugin-html';
 import totalBundlesize from '@blockquote/rollup-plugin-total-bundlesize';
 import externalizeSourceDependencies from '@blockquote/rollup-plugin-externalize-source-dependencies';
 
@@ -36,10 +35,11 @@ export default defineConfig({
       exclude: ['**/src/**/index.*', '**/src/styles/'],
     },
     browser: {
-      provider: 'playwright',
       enabled: true,
-      name: 'chromium',
       headless: false,
+      name: 'chromium',
+      provider: 'playwright',
+      viewport: {width: 1920, height: 1080},
     },
   },
   plugins: [
