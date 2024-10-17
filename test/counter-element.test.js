@@ -1,7 +1,7 @@
 import {beforeEach, afterEach, describe, expect, vi, test} from 'vitest';
 import {assert as a11y, fixture, fixtureCleanup, html} from '@open-wc/testing';
 import {page, userEvent} from '@vitest/browser/context';
-import sinon from 'sinon';
+import {match, spy} from 'sinon';
 import {structureSnapshot} from './utils.js';
 import '../define/counter-element.js';
 
@@ -72,9 +72,9 @@ describe('Lit Component testing', () => {
 
     test('counterchange event is dispatched - sinon', async () => {
       const button = elShadowRoot.querySelector('md-filled-button');
-      const spy = sinon.spy(el, 'dispatchEvent');
+      const spyEvent = spy(el, 'dispatchEvent');
       await userEvent.click(button);
-      const calledWith = spy.calledWith(sinon.match.has('type', 'counterchange'));
+      const calledWith = spyEvent.calledWith(match.has('type', 'counterchange'));
       expect(calledWith).to.be.true;
     });
 
