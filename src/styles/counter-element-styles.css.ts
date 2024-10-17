@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { css } from 'lit';
 
 export const styles = css`:host {
