@@ -150,7 +150,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "define/counter-element.js",
+      "path": "src/define/counter-element.js",
       "declarations": [],
       "exports": [
         {

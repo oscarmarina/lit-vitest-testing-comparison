@@ -3,7 +3,7 @@ import {assert as a11y, fixture, fixtureCleanup, html} from '@open-wc/testing';
 import {page, userEvent} from '@vitest/browser/context';
 import {match, spy} from 'sinon';
 import {structureSnapshot} from './utils.js';
-import '../define/counter-element.js';
+import '../src/define/counter-element.js';
 
 // https://vitest.dev/guide/browser/context.html#context
 // https://main.vitest.dev/guide/browser/locators.html
