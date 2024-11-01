@@ -5,7 +5,7 @@ import {match, spy} from 'sinon';
 import {userEvent} from '@vitest/browser/context';
 import {structureSnapshot} from './utils.js';
 import {CounterElement} from '../src/CounterElement.js';
-import '../define/counter-element.js';
+import '../src/define/counter-element.js';
 
 // https://vitest.dev/guide/browser/context.html#context
 // https://main.vitest.dev/guide/browser/locators.html

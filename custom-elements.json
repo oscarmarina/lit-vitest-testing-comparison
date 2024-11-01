@@ -127,6 +127,21 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/define/counter-element.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "counter-element",
+          "declaration": {
+            "name": "CounterElement",
+            "module": "/src/CounterElement.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/styles/counter-element-styles.css.ts",
       "declarations": [
         {
@@ -142,21 +157,6 @@
           "declaration": {
             "name": "styles",
             "module": "src/styles/counter-element-styles.css.ts"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "define/counter-element.ts",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "custom-element-definition",
-          "name": "counter-element",
-          "declaration": {
-            "name": "CounterElement",
-            "module": "/src/CounterElement.js"
           }
         }
       ]
