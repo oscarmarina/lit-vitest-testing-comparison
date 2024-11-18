@@ -38,6 +38,11 @@ export default defineConfig({
       name: 'chromium',
       provider: 'playwright',
       viewport: {width: 1920, height: 1080},
+      providerOptions: {
+        launch: {
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+        },
+      },
     },
   },
   plugins: [
