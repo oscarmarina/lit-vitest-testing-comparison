@@ -2,7 +2,7 @@ import {beforeEach, afterEach, describe, expect, vi, test} from 'vitest';
 import {assert as a11y, fixture, fixtureCleanup, html} from '@open-wc/testing';
 import {page, userEvent} from '@vitest/browser/context';
 import {match, spy} from 'sinon';
-import {structureSnapshot} from './utils.js';
+import {htmlStructureSnapshot} from './utils.js';
 import '../src/define/counter-element.js';
 
 // https://vitest.dev/guide/browser/context.html#context
@@ -37,11 +37,11 @@ describe('Lit Component testing', () => {
     });
 
     test('SHADOW DOM - Structure test', () => {
-      expect(structureSnapshot(elShadowRoot)).toMatchSnapshot('SHADOW DOM');
+      expect(htmlStructureSnapshot(elShadowRoot)).toMatchSnapshot('SHADOW DOM');
     });
 
     test('LIGHT DOM - Structure test', () => {
-      expect(structureSnapshot(el, ['id'])).toMatchSnapshot('LIGHT DOM');
+      expect(htmlStructureSnapshot(el, ['id'])).toMatchSnapshot('LIGHT DOM');
     });
 
     test('a11y', async () => {

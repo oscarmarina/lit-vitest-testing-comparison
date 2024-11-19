@@ -15,6 +15,25 @@ const removeComments = (cnode) => (cnode || '').replace(/<!--[\s\S]*?-->/g, '');
 const removeCommentsAndFormat = (cnode) => removeComments(cnode).replace(/\s\s+/g, '');
 
 /**
+ * Removes specified attributes from an HTML node and its children.
+ * @param {Node} currentNode - The node to remove the attributes from.
+ * @param {string[]} ignoreAttributes - The attributes to remove from the node and its children.
+ */
+const removeAttributes = (currentNode, ignoreAttributes) => {
+  if (
+    (currentNode?.nodeType === 1 || currentNode?.nodeType === 11) &&
+    Array.isArray(ignoreAttributes)
+  ) {
+    if (currentNode.nodeType === 1) {
+      ignoreAttributes.forEach((attr) =>
+        /** @type {HTMLElement} */ (currentNode).removeAttribute(attr)
+      );
+    }
+    [...currentNode.childNodes].forEach((child) => removeAttributes(child, ignoreAttributes));
+  }
+};
+
+/**
  * Returns the outerHTML or innerHTML of a node after removing specified attributes from it and its children.
  *
  * If the initial node is an HTMLElement, the function returns the outerHTML of the node.
@@ -24,39 +43,17 @@ const removeCommentsAndFormat = (cnode) => removeComments(cnode).replace(/\s\s+/
  * @param {string[]} ignoreAttributes - The attributes to remove from the node and its children.
  * @returns {string} The outerHTML or innerHTML of the node after removing the specified attributes.
  */
-export const structureSnapshot = (node, ignoreAttributes = []) => {
-  const initialNodeIsHTMLElement = node instanceof HTMLElement;
-  const initialNodeIsShadowRoot = node instanceof ShadowRoot;
+export const htmlStructureSnapshot = (node, ignoreAttributes = []) => {
+  const isHTMLElement = node instanceof HTMLElement;
+  const isShadowRoot = node instanceof ShadowRoot;
 
-  /**
-   * Removes specified attributes from an HTML node and its children.
-   * @param {Node} currentNode - The node to remove the attributes from.
-   */
-  const removeAttributes = (currentNode) => {
-    if (currentNode && ignoreAttributes && Array.isArray(ignoreAttributes)) {
-      if (
-        currentNode instanceof HTMLElement &&
-        currentNode.nodeType !== 3 &&
-        currentNode.nodeType !== 8
-      ) {
-        ignoreAttributes.forEach((attr) => currentNode.removeAttribute(attr));
-      }
-
-      // Look for HTMLElements in its children.
-      Array.from(currentNode.childNodes).forEach((child) => removeAttributes(child));
+  if (isHTMLElement || isShadowRoot) {
+    if (ignoreAttributes.length > 0) {
+      removeAttributes(node, ignoreAttributes);
     }
-  };
 
-  removeAttributes(node);
-
-  // If the initial node is an HTMLElement, return the outerHTML after removing comments and formatting.
-  // If the initial node is a ShadowRoot, return the innerHTML after removing comments and formatting.
-  let result = '';
-  if (initialNodeIsHTMLElement) {
-    result = removeCommentsAndFormat(node ? node.outerHTML : '');
-  } else if (initialNodeIsShadowRoot) {
-    result = removeCommentsAndFormat(node ? node.innerHTML : '');
+    const htmlContent = isShadowRoot ? node.innerHTML : node.outerHTML;
+    return removeCommentsAndFormat(htmlContent);
   }
-
-  return result;
+  return '';
 };
