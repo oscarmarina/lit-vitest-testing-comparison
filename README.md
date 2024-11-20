@@ -71,7 +71,7 @@ This allows us to use Vitest's snapshot feature in a way that is more meaningful
 
 ```js
 test('LIGHT DOM - Structure test', () => {
-  expect(structureSnapshot(el, ['id'])).toMatchSnapshot('LIGHT DOM');
+  expect(htmlStructureSnapshot(el, ['id'])).toMatchSnapshot('LIGHT DOM');
 });
 ```
 
