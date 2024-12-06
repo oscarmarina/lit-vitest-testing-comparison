@@ -71,18 +71,20 @@ describe('Lit Component testing', () => {
     });
 
     test('counterchange event is dispatched - sinon', async () => {
-      const button = elShadowRoot.querySelector('md-filled-button');
       const spyEvent = spy(el, 'dispatchEvent');
-      await userEvent.click(button);
+      const button = elLocator.getByText('Counter: 5');
+      const elButton = button.query();
+      await userEvent.click(elButton);
       const calledWith = spyEvent.calledWith(match.has('type', 'counterchange'));
       expect(calledWith).to.be.true;
     });
 
     test('counterchange event is dispatched - vi.fn', async () => {
       const spyClick = vi.fn();
-      const button = elShadowRoot.querySelector('md-filled-button');
+      const button = elLocator.getByText('Counter: 5');
+      const elButton = button.query();
       el?.addEventListener('counterchange', spyClick);
-      await userEvent.click(button);
+      await userEvent.click(elButton);
       await el.updateComplete;
       expect(spyClick).toHaveBeenCalled();
     });
