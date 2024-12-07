@@ -41,6 +41,7 @@
   "scripts": {
     "analyze": "cem analyze --litelement --globs \"src/**/*.{js,ts}\" \"index.js\"",
     "build": "npm run build:tsc && npm run dev:vite",
+    "build:storybook": "storybook build",
     "build:tsc": "tsc",
     "dev:vite": "vite build",
     "format": "npm run format:eslint && npm run format:prettier && npm run format:stylelint",
@@ -57,6 +58,7 @@
     "sass:watch": "sass-style-template -j ts",
     "sort:package": "npx sort-package-json",
     "start": "concurrently -k -r \"npm:sass:watch\" \"npm:vite\"",
+    "storybook": "storybook dev -p 6006",
     "test": "vitest",
     "vite": "vite"
   },
@@ -107,10 +109,21 @@
     "@blockquote/rollup-plugin-externalize-source-dependencies": "^1.0.0",
     "@blockquote/rollup-plugin-total-bundlesize": "^2.1.2",
     "@blockquote/sass-style-template": "^4.1.0",
+    "@chromatic-com/storybook": "^3.2.2",
     "@custom-elements-manifest/analyzer": "^0.10.3",
     "@html-eslint/eslint-plugin": "^0.30.0",
     "@html-eslint/parser": "^0.30.0",
     "@open-wc/testing": "^4.0.0",
+    "@storybook/addon-a11y": "^8.4.7",
+    "@storybook/addon-actions": "^8.4.7",
+    "@storybook/addon-essentials": "^8.4.7",
+    "@storybook/addon-interactions": "^8.4.7",
+    "@storybook/addon-links": "^8.4.7",
+    "@storybook/addon-storysource": "^8.4.7",
+    "@storybook/blocks": "^8.4.7",
+    "@storybook/test": "^8.4.7",
+    "@storybook/web-components": "^8.4.7",
+    "@storybook/web-components-vite": "^8.4.7",
     "@types/mocha": "^10.0.10",
     "@vitest/browser": "^3.0.0-beta.1",
     "@vitest/coverage-istanbul": "^3.0.0-beta.1",
@@ -131,6 +144,7 @@
     "prettier": "^3.4.2",
     "sinon": "^19.0.2",
     "sort-package-json": "^2.12.0",
+    "storybook": "^8.4.7",
     "stylelint": "^16.11.0",
     "stylelint-config-standard-scss": "^14.0.0",
     "ts-lit-plugin": "^2.0.2",
@@ -138,7 +152,8 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.17.0",
     "vite": "^6.0.3",
-    "vitest": "^3.0.0-beta.1"
+    "vitest": "^3.0.0-beta.1",
+    "wc-storybook-helpers": "^2.0.4"
   },
   "publishConfig": {
     "access": "public"
