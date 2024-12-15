@@ -1,45 +1,34 @@
 {
   "compilerOptions": {
-    "incremental": true,
-    "composite": true,
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "experimentalDecorators": true,
-    "module": "ES2022",
-    "moduleResolution": "Bundler",
-    "resolvePackageJsonExports": true,
-    "resolvePackageJsonImports": true,
-    "resolveJsonModule": true,
     "allowArbitraryExtensions": true,
     "declaration": true,
+    "declarationDir": "./dist/",
     "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "stripInternal": true,
-    "verbatimModuleSyntax": true,
+    "emitDeclarationOnly": true,
     "esModuleInterop": true,
+    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
+    "module": "es2022",
+    "moduleResolution": "Bundler",
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
+    "resolveJsonModule": true,
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true,
+    "rootDir": "./src/",
+    "sourceMap": true,
+    "strict": true,
+    "stripInternal": true,
+    "target": "es2022",
+    "types": ["mocha"],
     "useDefineForClassFields": false,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "plugins": [
-      {
-        "name": "ts-lit-plugin",
-        "rules": {
-          "no-unknown-slot": "warning",
-          "no-unknown-attribute": "warning",
-          "no-unknown-property": "warning",
-          "no-unknown-event": "warning"
-        }
-      }
-    ],
-    "types": ["mocha"]
+    "verbatimModuleSyntax": true
   },
-  "include": ["src/**/*.ts", "define/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }
