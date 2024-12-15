@@ -1,14 +1,15 @@
-import {beforeEach, afterEach, describe, expect, vi, test} from 'vitest';
-import {assert as a11y, fixture, fixtureCleanup, html} from '@open-wc/testing';
+import {beforeAll, afterAll, beforeEach, afterEach, suite, assert, expect, vi, test} from 'vitest';
+import {assert as a11y, fixture, fixtureCleanup} from '@open-wc/testing';
+import {getDiffableHTML} from '@open-wc/semantic-dom-diff';
+import {html} from 'lit';
 import {page, userEvent} from '@vitest/browser/context';
 import {match, spy} from 'sinon';
-import {htmlStructureSnapshot} from './utils.js';
 import '../src/define/counter-element.js';
 
 // https://vitest.dev/guide/browser/context.html#context
 // https://main.vitest.dev/guide/browser/locators.html
 
-describe('Lit Component testing', () => {
+suite('Lit Component testing', () => {
   /**
    * @type {import('../src/index').CounterElement}
    */
@@ -16,32 +17,32 @@ describe('Lit Component testing', () => {
   let elShadowRoot;
   let elLocator;
 
-  describe('Default', () => {
-    beforeEach(async () => {
+  suite('Default', () => {
+    beforeAll(async () => {
       el = await fixture(html`
         <counter-element>light-dom</counter-element>
       `);
-      elShadowRoot = el?.shadowRoot;
+      elShadowRoot = el?.shadowRoot?.innerHTML;
       elLocator = page.elementLocator(el);
     });
 
-    afterEach(() => {
+    afterAll(() => {
       fixtureCleanup();
     });
 
     test('has a default heading "Hey there" and counter 5', async () => {
       const button = await elLocator.getByText('Counter: 5').query();
       const heading = await elLocator.getByText('Hey there').query();
-      expect(button).to.be.ok;
-      expect(heading).to.be.ok;
+      assert.isOk(button);
+      assert.isOk(heading);
     });
 
     test('SHADOW DOM - Structure test', () => {
-      expect(htmlStructureSnapshot(elShadowRoot)).toMatchSnapshot('SHADOW DOM');
+      expect(getDiffableHTML(elShadowRoot)).toMatchSnapshot('SHADOW DOM');
     });
 
     test('LIGHT DOM - Structure test', () => {
-      expect(htmlStructureSnapshot(el, ['id'])).toMatchSnapshot('LIGHT DOM');
+      expect(getDiffableHTML(el, {ignoreAttributes: ['id']})).toMatchSnapshot('LIGHT DOM');
     });
 
     test('a11y', async () => {
@@ -49,12 +50,11 @@ describe('Lit Component testing', () => {
     });
   });
 
-  describe('Events ', () => {
+  suite('Events ', () => {
     beforeEach(async () => {
       el = await fixture(html`
         <counter-element>light-dom</counter-element>
       `);
-      elShadowRoot = el?.shadowRoot;
       elLocator = page.elementLocator(el);
     });
 
@@ -67,7 +67,7 @@ describe('Lit Component testing', () => {
       const elButton = button.query();
       await button.dblClick();
       await el.updateComplete;
-      expect(elButton.textContent).to.include('Counter: 7');
+      assert.include(elButton.textContent, 'Counter: 7');
     });
 
     test('counterchange event is dispatched - sinon', async () => {
@@ -76,7 +76,7 @@ describe('Lit Component testing', () => {
       const elButton = button.query();
       await userEvent.click(elButton);
       const calledWith = spyEvent.calledWith(match.has('type', 'counterchange'));
-      expect(calledWith).to.be.true;
+      assert.isTrue(calledWith);
     });
 
     test('counterchange event is dispatched - vi.fn', async () => {
@@ -86,16 +86,15 @@ describe('Lit Component testing', () => {
       el?.addEventListener('counterchange', spyClick);
       await userEvent.click(elButton);
       await el.updateComplete;
-      expect(spyClick).toHaveBeenCalled();
+      assert.isTrue(spyClick.mock.calls.length > 0);
     });
   });
 
-  describe('Override ', () => {
+  suite('Override ', () => {
     beforeEach(async () => {
       el = await fixture(html`
         <counter-element heading="attribute heading"></counter-element>
       `);
-      elShadowRoot = el?.shadowRoot;
       elLocator = page.elementLocator(el);
     });
 
@@ -104,7 +103,7 @@ describe('Lit Component testing', () => {
     });
 
     test('can override the heading via attribute', () => {
-      expect(el).to.have.property('heading', 'attribute heading');
+      assert.propertyVal(el, 'heading', 'attribute heading');
     });
   });
 });
