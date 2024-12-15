@@ -28,6 +28,19 @@ export default defineConfig({
       }
     },
     include: ['test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    browser: {
+      enabled: true,
+      headless: false,
+      name: 'chromium',
+      provider: 'playwright',
+      screnshotfailures: false,
+      viewport: {width: 1920, height: 1080},
+      providerOptions: {
+        launch: {
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+        },
+      },
+    },
     coverage: {
       provider: 'v8',
       reportsDirectory: `${outDir}/test/coverage/`,
@@ -41,18 +54,6 @@ export default defineConfig({
       },
       include: ['src/**/*'],
       exclude: ['**/src/**/index.*', '**/src/styles/'],
-    },
-    browser: {
-      enabled: true,
-      headless: false,
-      name: 'chromium',
-      provider: 'playwright',
-      viewport: {width: 1920, height: 1080},
-      providerOptions: {
-        launch: {
-          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
-        },
-      },
     },
   },
   plugins: [

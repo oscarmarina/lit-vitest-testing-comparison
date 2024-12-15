@@ -1,9 +1,9 @@
 import {beforeAll, afterAll, suite, expect, vi, test, assert} from 'vitest';
 import {assert as a11y, fixture, fixtureCleanup} from '@open-wc/testing';
-import {html} from 'lit/static-html.js';
+import {getDiffableHTML} from '@open-wc/semantic-dom-diff';
+import {html} from 'lit';
 import {match, spy} from 'sinon';
 import {userEvent} from '@vitest/browser/context';
-import {htmlStructureSnapshot} from './utils.js';
 import {CounterElement} from '../src/CounterElement.js';
 import '../src/define/counter-element.js';
 
@@ -32,11 +32,11 @@ suite('Lit Component testing', () => {
     });
 
     test('SHADOW DOM - Structure test', () => {
-      expect(htmlStructureSnapshot(elShadowRoot)).toMatchSnapshot('SHADOW DOM');
+      expect(getDiffableHTML(elShadowRoot.innerHTML)).toMatchSnapshot('SHADOW DOM');
     });
 
     test('LIGHT DOM - Structure test', () => {
-      expect(htmlStructureSnapshot(el, ['id'])).toMatchSnapshot('LIGHT DOM');
+      expect(getDiffableHTML(el, {ignoreAttributes: ['id']})).toMatchSnapshot('LIGHT DOM');
     });
 
     test('a11y', async () => {
