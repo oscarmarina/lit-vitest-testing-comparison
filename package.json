@@ -13,35 +13,36 @@
   "type": "module",
   "exports": {
     ".": {
-      "default": "./src/index.js"
+      "default": "./dist/index.js"
     },
     "./package.json": {
       "default": "./package.json"
     },
     "./CounterElement.js": {
-      "default": "./src/CounterElement.js"
+      "default": "./dist/CounterElement.js"
     },
     "./counter-element.js": {
-      "default": "./define/counter-element.js"
+      "default": "./dist/define/counter-element.js"
     },
     "./index.js": {
-      "default": "./src/index.js"
+      "default": "./dist/index.js"
     },
     "./counter-element-styles.css.js": {
-      "default": "./src/styles/counter-element-styles.css.js"
+      "default": "./dist/styles/counter-element-styles.css.js"
     }
   },
-  "main": "src/index.js",
-  "module": "src/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "files": [
-    "/define/",
-    "/src/",
-    "index.js",
-    "!/**/*.scss"
+    "/dist/",
+    "/dist/index.*",
+    "!/dist/test/"
   ],
   "scripts": {
-    "analyze": "__cem analyze --litelement --globs \"{src,define}/**/*.{js,ts}\" \"index.js\"",
-    "build": "echo \"This is not a TypeScript project, so no need to build.\"",
+    "analyze": "cem analyze --litelement --globs \"src/**/*.{js,ts}\" \"index.js\"",
+    "build": "npm run dev:vite && npm run build:lib && npm run build:tsc",
+    "build:lib": "vite build --config vite.lib.config.js",
+    "build:tsc": "tsc",
     "dev:vite": "vite build",
     "format": "npm run format:eslint && npm run format:prettier && npm run format:stylelint",
     "format:eslint": "eslint . --fix",
@@ -54,7 +55,7 @@
     "lint:stylelint": "stylelint \"**/*.{scss,css}\" --allow-empty-input --ignore-path .prettierignore",
     "prepare": "husky",
     "preview:vite": "vite preview",
-    "sass:watch": "sass-style-template",
+    "sass:watch": "sass-style-template -j ts",
     "sort:package": "npx sort-package-json",
     "start": "concurrently -k -r \"npm:sass:watch\" \"npm:vite\"",
     "test": "vitest",
@@ -114,6 +115,7 @@
     "@open-wc/testing": "^4.0.0",
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@types/mocha": "^10.0.10",
+    "@typescript-eslint/parser": "^8.18.1",
     "@vitest/browser": "^3.0.0-beta.2",
     "@vitest/coverage-istanbul": "^3.0.0-beta.2",
     "@vitest/coverage-v8": "^3.0.0-beta.2",
@@ -132,12 +134,16 @@
     "playwright": "^1.49.1",
     "prettier": "^3.4.2",
     "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-node-externals": "^8.0.0",
     "sinon": "^19.0.2",
     "sort-package-json": "^2.12.0",
     "stylelint": "^16.12.0",
     "stylelint-config-standard-scss": "^14.0.0",
+    "tinyglobby": "^0.2.10",
     "ts-lit-plugin": "^2.0.2",
-    "typescript-eslint": "^8.18.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1",
     "vite": "^6.0.3",
     "vitest": "^3.0.0-beta.2"
   },

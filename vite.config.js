@@ -14,10 +14,9 @@ const copyConfig = {
   hook: 'writeBundle',
 };
 
-const outDir = process.env.OUTDIR || '.';
-
 // https://vitejs.dev/config/
 // https://vite-rollup-plugins.patak.dev/
+
 export default defineConfig({
   test: {
     onConsoleLog(log, type) {
@@ -41,7 +40,7 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      reportsDirectory: `${outDir}/test/coverage/`,
+      reportsDirectory: 'test/coverage/',
       reporter: ['lcov', 'json', 'text-summary', 'html'],
       enabled: true,
       thresholds: {
@@ -65,6 +64,9 @@ export default defineConfig({
     multi({entryFileName: 'entry.js'}),
     totalBundlesize(),
   ],
+  optimizeDeps: {
+    exclude: ['lit', 'lit-html'],
+  },
   build: {
     target: ['chrome71'],
     outDir: 'dev',

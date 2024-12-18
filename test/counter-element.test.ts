@@ -1,28 +1,26 @@
-import {beforeAll, afterAll, beforeEach, afterEach, suite, assert, expect, vi, test} from 'vitest';
+import {suite, test, assert, expect, beforeAll, afterAll, beforeEach, afterEach, vi} from 'vitest';
 import {assert as a11y, fixture, fixtureCleanup} from '@open-wc/testing';
 import {getDiffableHTML} from '@open-wc/semantic-dom-diff';
 import {html} from 'lit';
-import {page, userEvent} from '@vitest/browser/context';
 import {match, spy} from 'sinon';
+import {page, userEvent, type Locator} from '@vitest/browser/context';
+import {CounterElement} from '../src/CounterElement.js';
 import '../src/define/counter-element.js';
 
 // https://vitest.dev/guide/browser/context.html#context
 // https://main.vitest.dev/guide/browser/locators.html
 
 suite('Lit Component testing', () => {
-  /**
-   * @type {import('../src/index').CounterElement}
-   */
-  let el;
-  let elShadowRoot;
-  let elLocator;
+  let el: CounterElement;
+  let elShadowRoot: string;
+  let elLocator: Locator;
 
   suite('Default', () => {
     beforeAll(async () => {
       el = await fixture(html`
         <counter-element>light-dom</counter-element>
       `);
-      elShadowRoot = el?.shadowRoot?.innerHTML;
+      elShadowRoot = el?.shadowRoot!.innerHTML;
       elLocator = page.elementLocator(el);
     });
 
@@ -64,7 +62,7 @@ suite('Lit Component testing', () => {
 
     test('should increment value on click', async () => {
       const button = elLocator.getByText('Counter: 5');
-      const elButton = button.query();
+      const elButton = button.query()!;
       await button.dblClick();
       await el.updateComplete;
       assert.include(elButton.textContent, 'Counter: 7');
@@ -73,20 +71,20 @@ suite('Lit Component testing', () => {
     test('counterchange event is dispatched - sinon', async () => {
       const spyEvent = spy(el, 'dispatchEvent');
       const button = elLocator.getByText('Counter: 5');
-      const elButton = button.query();
+      const elButton = button.query()!;
       await userEvent.click(elButton);
       const calledWith = spyEvent.calledWith(match.has('type', 'counterchange'));
       assert.isTrue(calledWith);
     });
 
-    test('counterchange event is dispatched - vi.fn', async () => {
-      const spyClick = vi.fn();
+    test('counterchange event is dispatched - vi', async () => {
+      const spyEvent = vi.spyOn(el, 'dispatchEvent');
       const button = elLocator.getByText('Counter: 5');
-      const elButton = button.query();
-      el?.addEventListener('counterchange', spyClick);
+      const elButton = button.query()!;
       await userEvent.click(elButton);
       await el.updateComplete;
-      assert.isTrue(spyClick.mock.calls.length > 0);
+      const calledWithCounterChange = spyEvent.mock.lastCall?.[0].type === 'counterchange';
+      assert.isTrue(calledWithCounterChange);
     });
   });
 
@@ -103,7 +101,7 @@ suite('Lit Component testing', () => {
     });
 
     test('can override the heading via attribute', () => {
-      assert.propertyVal(el, 'heading', 'attribute heading');
+      assert.equal(el.heading, 'attribute heading');
     });
   });
 });

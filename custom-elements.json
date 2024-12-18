@@ -4,7 +4,7 @@
   "modules": [
     {
       "kind": "javascript-module",
-      "path": "src/CounterElement.js",
+      "path": "src/CounterElement.ts",
       "declarations": [
         {
           "kind": "class",
@@ -18,6 +18,26 @@
           ],
           "members": [
             {
+              "kind": "field",
+              "name": "heading",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Hey there'",
+              "description": "The heading to say \"Hello\" to.",
+              "attribute": "heading"
+            },
+            {
+              "kind": "field",
+              "name": "counter",
+              "type": {
+                "text": "number"
+              },
+              "default": "5",
+              "description": "The number of times the button has been clicked.",
+              "attribute": "counter"
+            },
+            {
               "kind": "method",
               "name": "#onClick",
               "privacy": "private"
@@ -25,43 +45,21 @@
             {
               "kind": "method",
               "name": "sayHello",
-              "parameters": [
-                {
-                  "name": "heading",
-                  "description": "The heading to say \"Hello\" to",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ],
-              "description": "Formats a greeting",
               "return": {
                 "type": {
                   "text": "string"
                 }
-              }
-            },
-            {
-              "kind": "field",
-              "name": "heading",
-              "privacy": "public",
-              "type": {
-                "text": "string"
               },
-              "description": "The heading to say \"Hello\" to.",
-              "default": "'Hey there'",
-              "attribute": "heading"
-            },
-            {
-              "kind": "field",
-              "name": "counter",
-              "privacy": "public",
-              "type": {
-                "text": "number"
-              },
-              "description": "The number of times the button has been clicked.",
-              "default": "5",
-              "attribute": "counter"
+              "parameters": [
+                {
+                  "name": "heading",
+                  "type": {
+                    "text": "string"
+                  },
+                  "description": "The heading to say \"Hello\" to"
+                }
+              ],
+              "description": "Formats a greeting"
             }
           ],
           "events": [
@@ -79,8 +77,8 @@
               "type": {
                 "text": "string"
               },
-              "description": "The heading to say \"Hello\" to.",
               "default": "'Hey there'",
+              "description": "The heading to say \"Hello\" to.",
               "fieldName": "heading"
             },
             {
@@ -88,8 +86,8 @@
               "type": {
                 "text": "number"
               },
-              "description": "The number of times the button has been clicked.",
               "default": "5",
+              "description": "The number of times the button has been clicked.",
               "fieldName": "counter"
             }
           ],
@@ -107,14 +105,14 @@
           "name": "CounterElement",
           "declaration": {
             "name": "CounterElement",
-            "module": "src/CounterElement.js"
+            "module": "src/CounterElement.ts"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/index.js",
+      "path": "src/index.ts",
       "declarations": [],
       "exports": [
         {
@@ -129,7 +127,22 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/styles/counter-element-styles.css.js",
+      "path": "src/define/counter-element.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "counter-element",
+          "declaration": {
+            "name": "CounterElement",
+            "module": "/src/CounterElement.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/styles/counter-element-styles.css.ts",
       "declarations": [
         {
           "kind": "variable",
@@ -143,22 +156,7 @@
           "name": "styles",
           "declaration": {
             "name": "styles",
-            "module": "src/styles/counter-element-styles.css.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/define/counter-element.js",
-      "declarations": [],
-      "exports": [
-        {
-          "kind": "custom-element-definition",
-          "name": "counter-element",
-          "declaration": {
-            "name": "CounterElement",
-            "module": "/src/CounterElement.js"
+            "module": "src/styles/counter-element-styles.css.ts"
           }
         }
       ]

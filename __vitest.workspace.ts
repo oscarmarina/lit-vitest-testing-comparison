@@ -2,7 +2,7 @@ import {defineWorkspace} from 'vitest/config';
 
 export default defineWorkspace([
   {
-    extends: './vite.config.js',
+    extends: './vite.config.ts',
     test: {
       name: 'Chromium',
       browser: {
@@ -11,7 +11,7 @@ export default defineWorkspace([
     },
   },
   {
-    extends: './vite.config.js',
+    extends: './vite.config.ts',
     test: {
       name: 'Webkit',
       browser: {
