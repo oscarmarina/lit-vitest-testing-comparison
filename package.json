@@ -106,7 +106,7 @@
     "@blockquote/cem-to-markdown-readme": "^1.0.0",
     "@blockquote/coverage-table-reporter": "^1.2.0",
     "@blockquote/rollup-plugin-externalize-source-dependencies": "^1.0.0",
-    "@blockquote/rollup-plugin-total-bundlesize": "^2.1.2",
+    "@blockquote/rollup-plugin-total-bundlesize": "^2.2.0",
     "@blockquote/sass-style-template": "^4.1.0",
     "@custom-elements-manifest/analyzer": "^0.10.4",
     "@html-eslint/eslint-plugin": "^0.31.1",
@@ -128,7 +128,7 @@
     "eslint-plugin-lit": "^1.15.0",
     "eslint-plugin-lit-a11y": "^4.1.4",
     "eslint-plugin-wc": "^2.2.0",
-    "globals": "^15.13.0",
+    "globals": "^15.14.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
     "playwright": "^1.49.1",
@@ -144,7 +144,7 @@
     "tslib": "^2.8.1",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
-    "vite": "^6.0.3",
+    "vite": "^6.0.4",
     "vitest": "^3.0.0-beta.2"
   },
   "publishConfig": {

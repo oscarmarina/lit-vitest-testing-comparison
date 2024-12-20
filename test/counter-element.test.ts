@@ -73,8 +73,8 @@ suite('Lit Component testing', () => {
       const button = elLocator.getByText('Counter: 5');
       const elButton = button.query()!;
       await userEvent.click(elButton);
-      const calledWith = spyEvent.calledWith(match.has('type', 'counterchange'));
-      assert.isTrue(calledWith);
+      const calledWithCounterChange = spyEvent.calledWith(match.has('type', 'counterchange'));
+      assert.isTrue(calledWithCounterChange);
     });
 
     test('counterchange event is dispatched - vi', async () => {
@@ -82,7 +82,6 @@ suite('Lit Component testing', () => {
       const button = elLocator.getByText('Counter: 5');
       const elButton = button.query()!;
       await userEvent.click(elButton);
-      await el.updateComplete;
       const calledWithCounterChange = spyEvent.mock.lastCall?.[0].type === 'counterchange';
       assert.isTrue(calledWithCounterChange);
     });
