@@ -20,7 +20,7 @@ const copyConfig = {
 export default defineConfig({
   test: {
     onConsoleLog(log, type) {
-      if (log.includes('in dev mode')) {
+      if (type === 'stderr' && log.includes('in dev mode')) {
         return false;
       }
     },
@@ -30,13 +30,17 @@ export default defineConfig({
       headless: false,
       name: 'chromium',
       provider: 'playwright',
-      screnshotfailures: false,
+      screenshotFailures: false,
       viewport: {width: 1920, height: 1080},
-      providerOptions: {
-        launch: {
-          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+      instances: [
+        {
+          browser: 'chromium',
+          launch: {
+            devtools: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+          },
         },
-      },
+      ],
     },
     coverage: {
       provider: 'v8',
@@ -54,12 +58,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    externalizeSourceDependencies([
-      /* @web/test-runner-commands needs to establish a web-socket
-       * connection. It expects a file to be served from the
-       * @web/dev-server. So it should be ignored by Vite */
-      '/__web-dev-server__web-socket.js',
-    ]),
+    externalizeSourceDependencies(['/__web-dev-server__web-socket.js']),
     copy(copyConfig),
     multi({entryFileName: 'entry.js'}),
     totalBundlesize(),
