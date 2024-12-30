@@ -13,6 +13,15 @@ const copyConfig = {
   hook: 'writeBundle',
 };
 
+const demoDir = 'demo';
+const demoGlob = [`${demoDir}/entry.js`];
+const entries = Object.fromEntries(
+  demoGlob.map((file) => {
+    const [key] = file.match(new RegExp(`(?<=${demoDir}\/).*`)) || [];
+    return [key?.replace(/\.[^.]*$/, ''), file];
+  })
+);
+
 // https://vitejs.dev/config/
 // https://vite-rollup-plugins.patak.dev/
 
@@ -69,10 +78,10 @@ export default defineConfig({
     outDir: 'dev',
     rollupOptions: {
       preserveEntrySignatures: 'exports-only',
-      input: 'demo/entry.js',
+      input: entries,
       output: {
         dir: 'dev/',
-        entryFileNames: 'entry.js',
+        entryFileNames: '[name].js',
         format: 'es',
       },
     },
