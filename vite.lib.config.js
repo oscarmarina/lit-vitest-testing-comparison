@@ -2,13 +2,13 @@ import {defineConfig} from 'vite';
 import {nodeExternals} from 'rollup-plugin-node-externals';
 import {globSync} from 'tinyglobby';
 
-const srcDir = 'src';
-const srcGlob = `${srcDir}/**/*.ts`;
+const entriesDir = 'src';
+const entriesGlob = `${entriesDir}/**/*.ts`;
 
 // https://github.com/vitejs/vite/discussions/1736#discussioncomment-5126923
 const entries = Object.fromEntries(
-  globSync(srcGlob).map((file) => {
-    const [key] = file.match(new RegExp(`(?<=${srcDir}\/).*`)) || [];
+  globSync(entriesGlob).map((file) => {
+    const [key] = file.match(new RegExp(`(?<=${entriesDir}\/).*`)) || [];
     return [key?.replace(/\.[^.]*$/, ''), file];
   })
 );

@@ -13,11 +13,13 @@ const copyConfig = {
   hook: 'writeBundle',
 };
 
-const demoDir = 'demo';
-const demoGlob = [`${demoDir}/entry.js`];
+const entriesDir = 'demo';
+const entriesGlob = [`${entriesDir}/entry.js`];
+
+// https://github.com/vitejs/vite/discussions/1736#discussioncomment-5126923
 const entries = Object.fromEntries(
-  demoGlob.map((file) => {
-    const [key] = file.match(new RegExp(`(?<=${demoDir}\/).*`)) || [];
+  entriesGlob.map((file) => {
+    const [key] = file.match(new RegExp(`(?<=${entriesDir}\/).*`)) || [];
     return [key?.replace(/\.[^.]*$/, ''), file];
   })
 );
