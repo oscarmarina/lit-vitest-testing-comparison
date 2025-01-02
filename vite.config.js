@@ -1,6 +1,7 @@
 import {defineConfig} from 'vite';
 import copy from 'rollup-plugin-copy';
 import totalBundlesize from '@blockquote/rollup-plugin-total-bundlesize';
+// import {preventRewriteImportsTypeModule} from '@blockquote/vite-plugin-prevent-rewrite-imports-type-module';
 import externalizeSourceDependencies from '@blockquote/rollup-plugin-externalize-source-dependencies';
 
 const copyConfig = {

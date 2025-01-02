@@ -108,6 +108,7 @@
     "@blockquote/rollup-plugin-externalize-source-dependencies": "^1.0.0",
     "@blockquote/rollup-plugin-total-bundlesize": "^2.2.0",
     "@blockquote/sass-style-template": "^4.1.0",
+    "@blockquote/vite-plugin-prevent-rewrite-imports-type-module": "^0.1.1",
     "@custom-elements-manifest/analyzer": "^0.10.4",
     "@html-eslint/eslint-plugin": "^0.31.1",
     "@html-eslint/parser": "^0.31.0",
