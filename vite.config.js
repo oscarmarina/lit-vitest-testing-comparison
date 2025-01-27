@@ -7,7 +7,7 @@ import externalizeSourceDependencies from '@blockquote/rollup-plugin-externalize
 const copyConfig = {
   targets: [
     {
-      src: ['demo/*.html'],
+      src: ['demo/*.html', 'demo/*.css'],
       dest: 'dev/',
     },
   ],
