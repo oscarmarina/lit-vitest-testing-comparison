@@ -85,6 +85,12 @@
         "options": {
           "singleQuote": false
         }
+      },
+      {
+        "files": "*.json",
+        "options": {
+          "parser": "json-stringify"
+        }
       }
     ]
   },
