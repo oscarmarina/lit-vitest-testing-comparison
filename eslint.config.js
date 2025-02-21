@@ -7,8 +7,9 @@ import {configs as lit} from 'eslint-plugin-lit';
 import * as importPlugin from 'eslint-plugin-import';
 import tseslint from 'typescript-eslint';
 import tsParser from '@typescript-eslint/parser';
-import html from '@html-eslint/eslint-plugin';
-import htmlParser from '@html-eslint/parser';
+import htmlEslint from '@html-eslint/eslint-plugin';
+import htmlEslintParser from '@html-eslint/parser';
+import eslintPluginHtml from 'eslint-plugin-html';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import globals from 'globals';
 
@@ -108,14 +109,14 @@ const tsFilesRules = {
 };
 
 // @html-eslint/eslint-plugin
-const htmlFilesConfig = [html.configs['flat/recommended']].map((conf) => ({
+const htmlFilesConfig = [htmlEslint.configs['flat/recommended']].map((conf) => ({
   ...conf,
   files: ['**/*.html'],
   plugins: {
-    '@html-eslint': html,
+    '@html-eslint': htmlEslint,
   },
   languageOptions: {
-    parser: htmlParser,
+    parser: htmlEslintParser,
   },
 }));
 
@@ -127,6 +128,12 @@ const htmlFilesRules = {
     '@html-eslint/no-extra-spacing-attrs': 'off',
     '@html-eslint/attrs-newline': 'off',
   },
+};
+
+// @eslint-plugin-html
+const eslintPluginHtmlConfig = {
+  files: ['**/*.html'],
+  plugins: {eslintPluginHtml},
 };
 
 // eslint-config
@@ -149,7 +156,6 @@ export default [
       '**/*.config.*',
       '**/*.d.ts',
       '**/*.min.js',
-      '**/*-styles.*',
       '**/*.workspace.*',
     ],
   },
@@ -165,6 +171,7 @@ export default [
   tsFilesRules,
   ...htmlFilesConfig,
   htmlFilesRules,
+  eslintPluginHtmlConfig,
   eslintConfigPrettier,
   {
     languageOptions: {
