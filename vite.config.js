@@ -42,7 +42,6 @@ export default defineConfig({
     browser: {
       enabled: true,
       headless: false,
-      name: 'chromium',
       provider: 'playwright',
       screenshotFailures: false,
       viewport: {width: 1920, height: 1080},
@@ -54,10 +53,14 @@ export default defineConfig({
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
           },
         },
+        {
+          browser: 'webkit',
+          launch: {},
+        },
       ],
     },
     coverage: {
-      provider: 'v8',
+      provider: 'istanbul',
       reportsDirectory: 'test/coverage/',
       reporter: ['lcov', 'json', 'text-summary', 'html'],
       enabled: true,
