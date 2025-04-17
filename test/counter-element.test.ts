@@ -3,7 +3,8 @@ import {assert as a11y, fixture, fixtureCleanup} from '@open-wc/testing';
 import {getDiffableHTML} from '@open-wc/semantic-dom-diff';
 import {html} from 'lit';
 import {match, spy} from 'sinon';
-import {page, userEvent, type Locator} from '@vitest/browser/context';
+import {type LocatorSelectors} from '@vitest/browser/context';
+import {getElementLocatorSelectors} from '@vitest/browser/utils';
 import {CounterElement} from '../src/CounterElement.js';
 import '../src/define/counter-element.js';
 
@@ -13,7 +14,7 @@ import '../src/define/counter-element.js';
 suite('Lit Component testing', () => {
   let el: CounterElement;
   let elShadowRoot: string;
-  let elLocator: Locator;
+  let elLocator: LocatorSelectors;
 
   suite('Default', () => {
     beforeAll(async () => {
@@ -21,7 +22,7 @@ suite('Lit Component testing', () => {
         <counter-element>light-dom</counter-element>
       `);
       elShadowRoot = el?.shadowRoot!.innerHTML;
-      elLocator = page.elementLocator(el);
+      elLocator = getElementLocatorSelectors(el);
     });
 
     afterAll(() => {
@@ -53,7 +54,7 @@ suite('Lit Component testing', () => {
       el = await fixture(html`
         <counter-element>light-dom</counter-element>
       `);
-      elLocator = page.elementLocator(el);
+      elLocator = getElementLocatorSelectors(el);
     });
 
     afterEach(() => {
@@ -71,8 +72,7 @@ suite('Lit Component testing', () => {
     test('counterchange event is dispatched - sinon', async () => {
       const spyEvent = spy(el, 'dispatchEvent');
       const button = elLocator.getByText('Counter: 5');
-      const elButton = button.query()!;
-      await userEvent.click(elButton);
+      await button.click();
       const calledWithCounterChange = spyEvent.calledWith(match.has('type', 'counterchange'));
       assert.isTrue(calledWithCounterChange);
     });
@@ -80,8 +80,7 @@ suite('Lit Component testing', () => {
     test('counterchange event is dispatched - vi', async () => {
       const spyEvent = vi.spyOn(el, 'dispatchEvent');
       const button = elLocator.getByText('Counter: 5');
-      const elButton = button.query()!;
-      await userEvent.click(elButton);
+      await button.click();
       const calledWithCounterChange = spyEvent.mock.lastCall?.[0].type === 'counterchange';
       assert.isTrue(calledWithCounterChange);
     });
@@ -92,7 +91,7 @@ suite('Lit Component testing', () => {
       el = await fixture(html`
         <counter-element heading="attribute heading"></counter-element>
       `);
-      elLocator = page.elementLocator(el);
+      elLocator = getElementLocatorSelectors(el);
     });
 
     afterEach(() => {
