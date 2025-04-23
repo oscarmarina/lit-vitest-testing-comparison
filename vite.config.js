@@ -1,6 +1,6 @@
 import {defineConfig} from 'vite';
-import copy from 'rollup-plugin-copy';
 import {globSync} from 'tinyglobby';
+import copy from 'rollup-plugin-copy';
 import totalBundlesize from '@blockquote/rollup-plugin-total-bundlesize';
 import externalizeSourceDependencies from '@blockquote/rollup-plugin-externalize-source-dependencies';
 // import {preventRewriteImportsTypeModule} from '@blockquote/vite-plugin-prevent-rewrite-imports-type-module';
@@ -22,7 +22,7 @@ const copyConfig = {
 // https://github.com/vitejs/vite/discussions/1736#discussioncomment-5126923
 const entries = Object.fromEntries(
   globSync(ENTRIES_GLOB).map((file) => {
-    const [key] = file.match(new RegExp(`(?<=${ENTRIES_DIR}\/).*`)) || [];
+    const [key] = file.match(new RegExp(`(?<=${ENTRIES_DIR}/).*`)) || [];
     return [key?.replace(/\.[^.]*$/, ''), file];
   })
 );
@@ -52,10 +52,12 @@ export default defineConfig({
             devtools: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
           },
+          context: {},
         },
         {
           browser: 'webkit',
           launch: {},
+          context: {},
         },
       ],
     },
