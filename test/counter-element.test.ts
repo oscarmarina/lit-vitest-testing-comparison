@@ -29,9 +29,9 @@ suite('Lit Component testing', () => {
       fixtureCleanup();
     });
 
-    test('has a default heading "Hey there" and counter 5', async () => {
-      const button = await elLocator.getByText('Counter: 5').query();
-      const heading = await elLocator.getByText('Hey there').query();
+    test('has a default heading "Hey there" and counter 5', () => {
+      const button = elLocator.getByText('Counter: 5').query();
+      const heading = elLocator.getByText('Hey there').query();
       assert.isOk(button);
       assert.isOk(heading);
     });
