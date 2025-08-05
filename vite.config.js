@@ -87,7 +87,7 @@ export default defineConfig({
   build: {
     target: ['chrome71'],
     outDir: OUT_DIR,
-    rollupOptions: {
+    rolldownOptions: {
       preserveEntrySignatures: 'exports-only',
       input: entries,
       output: {
