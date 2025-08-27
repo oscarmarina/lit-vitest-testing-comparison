@@ -1,12 +1,26 @@
-import {suite, test, assert, expect, beforeAll, afterAll, beforeEach, afterEach, vi} from 'vitest';
-import {assert as a11y, fixture, fixtureCleanup} from '@open-wc/testing';
-import {getDiffableHTML} from '@open-wc/semantic-dom-diff';
+import {
+  suite,
+  test,
+  assert,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  vi,
+  chai,
+} from 'vitest';
+import {fixture, fixtureCleanup} from '@open-wc/testing-helpers';
+import {chaiA11yAxe} from 'chai-a11y-axe';
+import {getDiffableHTML} from '@open-wc/semantic-dom-diff/get-diffable-html.js';
 import {html} from 'lit';
 import {match, spy} from 'sinon';
 import {type LocatorSelectors} from '@vitest/browser/context';
 import {getElementLocatorSelectors} from '@vitest/browser/utils';
 import {CounterElement} from '../src/CounterElement.js';
 import '../src/define/counter-element.js';
+
+chai.use(chaiA11yAxe);
 
 // https://vitest.dev/guide/browser/context.html#context
 // https://main.vitest.dev/guide/browser/locators.html
@@ -45,7 +59,7 @@ suite('Lit Component testing', () => {
     });
 
     test('a11y', async () => {
-      await a11y.isAccessible(el);
+      await assert.isAccessible(el);
     });
   });
 
