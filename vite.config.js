@@ -1,5 +1,5 @@
 import {defineConfig} from 'vite';
-import {playwright} from '@vitest/browser/providers/playwright';
+import {playwright} from '@vitest/browser-playwright';
 import {globSync} from 'tinyglobby';
 import copy from 'rollup-plugin-copy';
 import totalBundlesize from '@blockquote/rollup-plugin-total-bundlesize';

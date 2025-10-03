@@ -10,13 +10,12 @@ import {
   vi,
   chai,
 } from 'vitest';
+import {type LocatorSelectors, utils} from 'vitest/browser';
 import {fixture, fixtureCleanup} from '@open-wc/testing-helpers';
 import {chaiA11yAxe} from 'chai-a11y-axe';
 import {getDiffableHTML} from '@open-wc/semantic-dom-diff/get-diffable-html.js';
 import {html} from 'lit';
 import {match, spy} from 'sinon';
-import {type LocatorSelectors} from '@vitest/browser/context';
-import {getElementLocatorSelectors} from '@vitest/browser/utils';
 import {CounterElement} from '../src/CounterElement.js';
 import '../src/define/counter-element.js';
 
@@ -36,7 +35,7 @@ suite('Lit Component testing', () => {
         <counter-element>light-dom</counter-element>
       `);
       elShadowRoot = el?.shadowRoot!.innerHTML;
-      elLocator = getElementLocatorSelectors(el);
+      elLocator = utils.getElementLocatorSelectors(el);
     });
 
     afterAll(() => {
@@ -68,7 +67,7 @@ suite('Lit Component testing', () => {
       el = await fixture(html`
         <counter-element>light-dom</counter-element>
       `);
-      elLocator = getElementLocatorSelectors(el);
+      elLocator = utils.getElementLocatorSelectors(el);
     });
 
     afterEach(() => {
@@ -105,7 +104,7 @@ suite('Lit Component testing', () => {
       el = await fixture(html`
         <counter-element heading="attribute heading"></counter-element>
       `);
-      elLocator = getElementLocatorSelectors(el);
+      elLocator = utils.getElementLocatorSelectors(el);
     });
 
     afterEach(() => {
