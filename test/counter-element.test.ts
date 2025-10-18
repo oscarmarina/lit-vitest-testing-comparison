@@ -10,7 +10,7 @@ import {
   vi,
   chai,
 } from 'vitest';
-import {type LocatorSelectors, utils} from 'vitest/browser';
+import {type LocatorSelectors, utils, cdp} from 'vitest/browser';
 import {fixture, fixtureCleanup} from '@open-wc/testing-helpers';
 import {chaiA11yAxe} from 'chai-a11y-axe';
 import {getDiffableHTML} from '@open-wc/semantic-dom-diff/get-diffable-html.js';
@@ -59,6 +59,41 @@ suite('Lit Component testing', () => {
 
     test('a11y', async () => {
       await assert.isAccessible(el);
+    });
+
+    test('AX tree', async () => {
+      // https://gist.github.com/jpzwarte/5d53d6a997fb0e652324fdcd3f1c42a6
+      const client = cdp() as {
+        send(method: string, params?: Record<string, unknown>): Promise<any>;
+      };
+
+      await client.send('Accessibility.enable');
+      await client.send('DOM.enable');
+
+      const {nodes} = await client.send('DOM.getFlattenedDocument', {
+        depth: -1,
+        pierce: true,
+      });
+
+      const hostNode = nodes.find((node: Node) => node.nodeName === el.nodeName);
+      const buttonDomNode = nodes.find((node: Node) => node.nodeName === 'MD-FILLED-BUTTON');
+
+      const hostSnapshot = await client.send('Accessibility.getPartialAXTree', {
+        backendNodeId: hostNode.backendNodeId,
+        maxDepth: -1,
+        fetchRelatives: true,
+      });
+
+      const hostAxNode = hostSnapshot.nodes[0];
+      assert.equal(hostAxNode?.role?.value, 'none');
+
+      const buttonSnapshot = await client.send('Accessibility.getPartialAXTree', {
+        backendNodeId: buttonDomNode.backendNodeId,
+        fetchRelatives: true,
+      });
+
+      const buttonAxNode = buttonSnapshot.nodes.find((node: any) => node.role?.value === 'button');
+      assert.isDefined(buttonAxNode);
     });
   });
 
