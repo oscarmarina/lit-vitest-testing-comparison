@@ -54,9 +54,6 @@ export default defineConfig({
         {
           browser: 'chromium',
         },
-        {
-          browser: 'webkit',
-        },
       ],
     },
     coverage: {
@@ -79,15 +76,18 @@ export default defineConfig({
     exclude: ['lit', 'lit-html'],
   },
   build: {
-    target: ['chrome71'],
     outDir: OUT_DIR,
-    rollupOptions: {
+    rolldownOptions: {
+      transform: {
+        target: ['chrome71'],
+      },
       input: entries,
       output: {
         dir: OUT_DIR,
         entryFileNames: '[name].js',
         format: 'es',
       },
+      treeshake: true,
     },
   },
 });
