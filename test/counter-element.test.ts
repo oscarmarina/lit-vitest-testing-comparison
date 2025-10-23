@@ -1,15 +1,4 @@
-import {
-  suite,
-  test,
-  assert,
-  expect,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  afterEach,
-  vi,
-  chai,
-} from 'vitest';
+import {describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi, chai} from 'vitest';
 import {type LocatorSelectors, utils} from 'vitest/browser';
 import {fixture, fixtureCleanup} from '@open-wc/testing-helpers';
 import {chaiA11yAxe} from 'chai-a11y-axe';
@@ -24,12 +13,12 @@ chai.use(chaiA11yAxe);
 // https://vitest.dev/guide/browser/context.html#context
 // https://main.vitest.dev/guide/browser/locators.html
 
-suite('Lit Component testing', () => {
+describe('Lit Component testing', () => {
   let el: CounterElement;
   let elShadowRoot: string;
   let elLocator: LocatorSelectors;
 
-  suite('Default', () => {
+  describe('Default', () => {
     beforeAll(async () => {
       el = await fixture(html`
         <counter-element>light-dom</counter-element>
@@ -42,27 +31,27 @@ suite('Lit Component testing', () => {
       fixtureCleanup();
     });
 
-    test('has a default heading "Hey there" and counter 5', () => {
+    it('has a default heading "Hey there" and counter 5', () => {
       const button = elLocator.getByText('Counter: 5').query();
       const heading = elLocator.getByText('Hey there').query();
-      assert.isOk(button);
-      assert.isOk(heading);
+      expect(button).toBeTruthy();
+      expect(heading).toBeTruthy();
     });
 
-    test('SHADOW DOM - Structure test', () => {
+    it('SHADOW DOM - Structure test', () => {
       expect(getDiffableHTML(elShadowRoot)).toMatchSnapshot('SHADOW DOM');
     });
 
-    test('LIGHT DOM - Structure test', () => {
+    it('LIGHT DOM - Structure test', () => {
       expect(getDiffableHTML(el, {ignoreAttributes: ['id']})).toMatchSnapshot('LIGHT DOM');
     });
 
-    test('a11y', async () => {
-      await assert.isAccessible(el);
+    it('a11y', async () => {
+      await expect(el).accessible();
     });
   });
 
-  suite('Events ', () => {
+  describe('Events ', () => {
     beforeEach(async () => {
       el = await fixture(html`
         <counter-element>light-dom</counter-element>
@@ -74,32 +63,31 @@ suite('Lit Component testing', () => {
       fixtureCleanup();
     });
 
-    test('should increment value on click', async () => {
+    it('should increment value on click', async () => {
       const button = elLocator.getByText('Counter: 5');
       const elButton = button.query()!;
       await button.dblClick();
       await el.updateComplete;
-      assert.include(elButton.textContent, 'Counter: 7');
+      expect(elButton.textContent).toContain('Counter: 7');
     });
 
-    test('counterchange event is dispatched - sinon', async () => {
+    it('counterchange event is dispatched - sinon', async () => {
       const spyEvent = spy(el, 'dispatchEvent');
       const button = elLocator.getByText('Counter: 5');
       await button.click();
       const calledWithCounterChange = spyEvent.calledWith(match.has('type', 'counterchange'));
-      assert.isTrue(calledWithCounterChange);
+      expect(calledWithCounterChange).toBe(true);
     });
 
-    test('counterchange event is dispatched - vi', async () => {
+    it('counterchange event is dispatched - vi', async () => {
       const spyEvent = vi.spyOn(el, 'dispatchEvent');
       const button = elLocator.getByText('Counter: 5');
       await button.click();
-      const calledWithCounterChange = spyEvent.mock.lastCall?.[0].type === 'counterchange';
-      assert.isTrue(calledWithCounterChange);
+      expect(spyEvent).toHaveBeenCalledWith(expect.objectContaining({type: 'counterchange'}));
     });
   });
 
-  suite('Override ', () => {
+  describe('Override ', () => {
     beforeEach(async () => {
       el = await fixture(html`
         <counter-element heading="attribute heading"></counter-element>
@@ -111,8 +99,8 @@ suite('Lit Component testing', () => {
       fixtureCleanup();
     });
 
-    test('can override the heading via attribute', () => {
-      assert.equal(el.heading, 'attribute heading');
+    it('can override the heading via attribute', () => {
+      expect(el.heading).toBe('attribute heading');
     });
   });
 });
