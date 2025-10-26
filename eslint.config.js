@@ -1,7 +1,7 @@
 import js from '@eslint/js';
 import {configs as wc} from 'eslint-plugin-wc';
 import {configs as lit} from 'eslint-plugin-lit';
-import litA11y from 'eslint-plugin-lit-a11y';
+import {default as litA11y} from 'eslint-plugin-lit-a11y';
 import {flatConfigs as importPlugin} from 'eslint-plugin-import';
 import tseslint from 'typescript-eslint';
 import tsParser from '@typescript-eslint/parser';
