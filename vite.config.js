@@ -39,9 +39,10 @@ export default defineConfig({
       }
     },
     include: ['test/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    forceRerunTriggers: ['**/src/**/*.scss*'],
     browser: {
       enabled: true,
-      headless: false,
+      headless: true,
       provider: playwright({
         launchOptions: {
           devtools: true,
