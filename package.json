@@ -138,10 +138,10 @@
     "@types/mocha": "^10.0.10",
     "@types/sinon": "^20.0.0",
     "@typescript-eslint/parser": "^8.46.4",
-    "@vitest/browser-playwright": "^4.0.8",
-    "@vitest/coverage-istanbul": "^4.0.8",
-    "@vitest/coverage-v8": "^4.0.8",
-    "@vitest/ui": "^4.0.8",
+    "@vitest/browser-playwright": "^4.0.9",
+    "@vitest/coverage-istanbul": "^4.0.9",
+    "@vitest/coverage-v8": "^4.0.9",
+    "@vitest/ui": "^4.0.9",
     "@web/rollup-plugin-html": "^2.3.0",
     "chai-a11y-axe": "^1.5.0",
     "concurrently": "^9.2.1",
@@ -172,7 +172,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.9"
   },
   "publishConfig": {
     "access": "public"
