@@ -1,3 +1,3 @@
-import '../src/define/counter-element.ts';
+import '../src/define/counter-element.js';
 
 export {html, css, render} from 'lit';
