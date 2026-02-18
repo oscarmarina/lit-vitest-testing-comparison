@@ -60,7 +60,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       reportsDirectory: 'test/coverage/',
-      reporter: ['lcov', 'json', 'text-summary', 'html'],
+      reporter: ['lcov', 'json', 'text-summary'],
       enabled: true,
       thresholds: {
         statements: 80,
