@@ -16,11 +16,25 @@ const entries = Object.fromEntries(
 export default defineConfig({
   plugins: [nodeExternals()],
   build: {
-    target: ['es2022'],
+    rolldownOptions: {
+      transform: {
+        target: ['es2022'],
+        assumptions: {
+          setPublicClassFields: true,
+        },
+        typescript: {
+          removeClassFieldsWithoutInitializer: true,
+        },
+        decorator: {
+          legacy: true,
+        },
+      },
+      treeshake: true,
+    },
+    minify: false,
     lib: {
       entry: entries,
       formats: ['es'],
     },
-    minify: false,
   },
 });

@@ -43,28 +43,24 @@ export default defineConfig({
     browser: {
       enabled: true,
       headless: true,
-      provider: playwright(),
+      provider: playwright({
+        launchOptions: {
+          devtools: true,
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+        },
+      }),
       screenshotFailures: false,
       viewport: {width: 1920, height: 1080},
       instances: [
         {
           browser: 'chromium',
-          provider: playwright({
-            launchOptions: {
-              devtools: true,
-              args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
-            },
-          }),
-        },
-        {
-          browser: 'webkit',
         },
       ],
     },
     coverage: {
       provider: 'istanbul',
       reportsDirectory: 'test/coverage/',
-      reporter: ['lcov', 'json', 'text-summary', 'html'],
+      reporter: ['lcov', 'json', 'text-summary'],
       enabled: true,
       thresholds: {
         statements: 80,
@@ -81,16 +77,19 @@ export default defineConfig({
     exclude: ['lit', 'lit-html'],
   },
   build: {
-    target: ['chrome71'],
     outDir: OUT_DIR,
-    rollupOptions: {
+    rolldownOptions: {
       preserveEntrySignatures: 'exports-only',
+      transform: {
+        target: ['chrome71'],
+      },
       input: entries,
       output: {
         dir: OUT_DIR,
         entryFileNames: '[name].js',
         format: 'es',
       },
+      treeshake: true,
     },
   },
 });

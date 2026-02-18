@@ -267,6 +267,7 @@ export default [
     files: [`**/test/**/*.${fileTypes}`],
     rules: {
       'no-unused-expressions': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ];
