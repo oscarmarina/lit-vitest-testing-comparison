@@ -27,33 +27,13 @@ test('a11y', async () => {
 });
 ```
 
-> However, you'll need to add the following plugin to your Vite configuration:
-
-- Configured via `vite.config.js`
-- [rollup-plugin-externalize-source-dependencies](https://github.com/oscarmarina/rollup-plugin-externalize-source-dependencies)
-
-```js
-import { defineConfig } from 'vite';
-import externalizeSourceDependencies from '@blockquote/rollup-plugin-externalize-source-dependencies';
-
-export default {
-  plugins: [
-    externalizeSourceDependencies([
-      /* @web/test-runner-commands needs to establish a web-socket
-       * connection. It expects a file to be served from the
-       * @web/dev-server. So it should be ignored by Vite */
-      '/__web-dev-server__web-socket.js',
-    ]),
-  ],
-};
-```
 
 #### Using Vitest Snapshots with Semantic-DOM-Diff
 
-Vitest's snapshot feature combines very well with `getDiffableHTML` from `@open-wc/semantic-dom-diff`, providing a powerful way to test DOM structures meaningfully.
+Vitest's snapshot feature combines very well with `getDiffableHTML` from `@open-wc`, providing a powerful way to test DOM structures meaningfully.
 
 ```js
-import {getDiffableHTML} from '@open-wc/semantic-dom-diff';
+import {getDiffableHTML} from '@open-wc/semantic-dom-diff/get-diffable-html.js';
 
 test('LIGHT DOM - Structure test', () => {
   expect(getDiffableHTML(el, {ignoreAttributes: ['id']})).toMatchSnapshot('LIGHT DOM');
