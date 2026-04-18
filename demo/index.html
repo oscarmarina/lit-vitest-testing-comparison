@@ -26,7 +26,7 @@
         html`
           <counter-element
             @counterchange="${(ev) => console.log('==>', ev.detail)}"
-            .heading=${heading}>
+            .heading="${heading}">
             some light-dom
           </counter-element>
         `,

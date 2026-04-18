@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Demo - pe-pe-ts</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="pe-pe-ts" />
+    <script type="importmap">
+      {
+        "imports": {
+          "lit": "https://cdn.jsdelivr.net/npm/lit@3.3.1/+esm",
+          "lit/decorators.js": "https://cdn.jsdelivr.net/npm/lit@3.3.1/decorators.js/+esm",
+          "@material/web/": "https://esm.run/@material/web@2/"
+        }
+      }
+    </script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <counter-element heading="Dist - World!">some dist light-dom</counter-element>
+    <script type="module" src="./define/counter-element.js"></script>
+    <script>
+      document.querySelector('counter-element').addEventListener('counterchange', (event) => {
+        console.log('Counter changed:', event.detail);
+      });
+    </script>
+  </body>
+</html>
