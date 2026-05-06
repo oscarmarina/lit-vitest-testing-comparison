@@ -43,6 +43,9 @@ const importFilesConfig = [importPlugin.recommended, importPlugin.typescript].ma
   languageOptions: {
     ...conf.languageOptions,
     parser: tsParser,
+    parserOptions: {
+      tsconfigRootDir: import.meta.dirname,
+    },
   },
 }));
 
@@ -146,6 +149,7 @@ const tsFilesConfig = [...tseslint.strict, ...tseslint.stylistic].map((conf) => 
             `*.conf.${fileTypes}`,
           ],
         },
+        tsconfigRootDir: import.meta.dirname,
       },
     },
   }),
@@ -189,7 +193,7 @@ const htmlFilesRules = {
   rules: {
     '@html-eslint/indent': 'off',
     '@html-eslint/require-closing-tags': 'off',
-    '@html-eslint/no-extra-spacing-attrs': 'off',
+    '@html-eslint/no-extra-spacing-tags': 'off',
     '@html-eslint/attrs-newline': 'off',
   },
 };
