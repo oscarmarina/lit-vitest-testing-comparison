@@ -4,7 +4,7 @@ import {fixture, fixtureCleanup} from '@open-wc/testing-helpers';
 import {chaiA11yAxe} from 'chai-a11y-axe';
 import {getDiffableHTML} from '@open-wc/semantic-dom-diff/get-diffable-html.js';
 import {html} from 'lit';
-import {match, spy} from 'sinon';
+import {match, spy /* , useFakeTimers, type SinonFakeTimers */} from 'sinon';
 import {CounterElement} from '../src/CounterElement.js';
 import '../src/define/counter-element.js';
 
@@ -17,6 +17,7 @@ describe('Lit Component testing', () => {
   let el: CounterElement;
   let elShadowRoot: string;
   let elLocator: LocatorSelectors;
+  // let clock: SinonFakeTimers;
 
   describe('Default', () => {
     beforeAll(async () => {
