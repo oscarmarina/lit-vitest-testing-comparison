@@ -22,6 +22,12 @@
         margin: 0;
         font-family: sans-serif;
       }
+
+      *:focus-visible:not(#a#b) {
+        /* inflating specificity */
+        outline-style: solid !important;
+        outline-width: 12px !important;
+      }
     </style>
   </head>
   <body>
