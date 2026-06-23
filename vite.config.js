@@ -1,4 +1,4 @@
-import {defineConfig} from 'vite';
+import {defineConfig} from 'vitest/config';
 import {playwright} from '@vitest/browser-playwright';
 import {globSync} from 'tinyglobby';
 import copy from 'rollup-plugin-copy';
@@ -45,8 +45,12 @@ export default defineConfig({
       headless: true,
       provider: playwright({
         launchOptions: {
-          devtools: true,
-          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+          args: [
+            '--auto-open-devtools-for-tabs',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-gpu',
+          ],
         },
       }),
       screenshotFailures: false,
