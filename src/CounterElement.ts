@@ -3,6 +3,8 @@ import {property} from 'lit/decorators.js';
 import {styles} from './styles/counter-element-styles.css.js';
 import '@material/web/button/filled-button.js';
 
+const imageUrl = new URL('./a11y-logo.png', import.meta.url).href;
+
 /**
  * ![Lit](https://img.shields.io/badge/lit-3.0.0-blue.svg)
  *
@@ -32,6 +34,7 @@ export class CounterElement extends LitElement {
   override render() {
     return html`
       <h1>${this.sayHello(this.heading)}!</h1>
+      <img src="${imageUrl}" alt="" />
       <md-filled-button @click=${this.#onClick}>Counter: ${this.counter}</md-filled-button>
       <hr aria-hidden="true" />
       <slot></slot>

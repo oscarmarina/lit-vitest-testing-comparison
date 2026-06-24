@@ -24,6 +24,14 @@ export const styles = css`
     margin: 0;
   }
 
+  img {
+    position: absolute;
+    opacity: 0.75;
+    width: 4rem;
+    inset-inline-end: 0.25rem;
+    inset-block-start: 0.25rem;
+  }
+
   md-filled-button {
     display: inline-flex;
     margin: 0.5rem 0;
