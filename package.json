@@ -139,10 +139,10 @@
     "@open-wc/testing-helpers": "^3.0.1",
     "@types/mocha": "^10.0.10",
     "@types/sinon": "^22.0.0",
-    "@vitest/browser-playwright": "^4.1.10",
-    "@vitest/coverage-istanbul": "^4.1.10",
-    "@vitest/coverage-v8": "^4.1.10",
-    "@vitest/ui": "^4.1.10",
+    "@vitest/browser-playwright": "^5.0.0-beta.6",
+    "@vitest/coverage-istanbul": "^5.0.0-beta.6",
+    "@vitest/coverage-v8": "^5.0.0-beta.6",
+    "@vitest/ui": "^5.0.0-beta.6",
     "chai-a11y-axe": "^1.5.0",
     "concurrently": "^10.0.3",
     "eslint": "^10.6.0",
@@ -172,7 +172,7 @@
     "typescript-eslint": "^8.63.0",
     "vite": "^8.1.4",
     "vite-plugin-static-copy": "^4.1.1",
-    "vitest": "^4.1.10"
+    "vitest": "^5.0.0-beta.6"
   },
   "publishConfig": {
     "access": "public"

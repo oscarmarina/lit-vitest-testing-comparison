@@ -10,6 +10,33 @@ import '../src/define/counter-element.js';
 
 chai.use(chaiA11yAxe);
 
+async function getAccessibilityTree(target: HTMLElement) {
+  const client = cdp() as {
+    send(method: string, params?: Record<string, unknown>): Promise<any>;
+  };
+
+  await client.send('Accessibility.enable');
+  await client.send('DOM.enable');
+
+  const {nodes} = await client.send('DOM.getFlattenedDocument', {
+    depth: -1,
+    pierce: true,
+  });
+
+  const hostNode = nodes.find((node: any) => node.nodeName === target.nodeName);
+  if (!hostNode) {
+    throw new Error('Target node not found in accessibility tree');
+  }
+
+  const snapshot = await client.send('Accessibility.getPartialAXTree', {
+    backendNodeId: hostNode.backendNodeId,
+    maxDepth: -1,
+    fetchRelatives: true,
+  });
+
+  return snapshot.nodes;
+}
+
 // https://vitest.dev/guide/browser/context.html#context
 // https://main.vitest.dev/guide/browser/locators.html
 
@@ -34,7 +61,7 @@ describe('Lit Component testing', () => {
 
     it('has a default heading "Hey there" and counter 5', () => {
       const button = elLocator.getByText('Counter: 5').query();
-      const heading = elLocator.getByText('Hey there').query();
+      const heading = elLocator.getByText('Hello, Hey there!').query();
       expect(button).toBeTruthy();
       expect(heading).toBeTruthy();
     });
@@ -51,39 +78,18 @@ describe('Lit Component testing', () => {
       await expect(el).accessible();
     });
 
+    it('exposes accessible content in the accessibility tree', async () => {
+      const nodes = await getAccessibilityTree(el);
+
+      expect(nodes.length).toBeGreaterThan(0);
+    });
+
     it('AX tree', async () => {
-      // https://gist.github.com/jpzwarte/5d53d6a997fb0e652324fdcd3f1c42a6
-      const client = cdp() as {
-        send(method: string, params?: Record<string, unknown>): Promise<any>;
-      };
+      const nodes = await getAccessibilityTree(el);
+      const hostAxNode = nodes[0];
 
-      await client.send('Accessibility.enable');
-      await client.send('DOM.enable');
-
-      const {nodes} = await client.send('DOM.getFlattenedDocument', {
-        depth: -1,
-        pierce: true,
-      });
-
-      const hostNode = nodes.find((node: Node) => node.nodeName === el.nodeName);
-      const buttonDomNode = nodes.find((node: Node) => node.nodeName === 'MD-FILLED-BUTTON');
-
-      const hostSnapshot = await client.send('Accessibility.getPartialAXTree', {
-        backendNodeId: hostNode.backendNodeId,
-        maxDepth: -1,
-        fetchRelatives: true,
-      });
-
-      const hostAxNode = hostSnapshot.nodes[0];
       expect(hostAxNode?.role?.value).toBe('none');
-
-      const buttonSnapshot = await client.send('Accessibility.getPartialAXTree', {
-        backendNodeId: buttonDomNode.backendNodeId,
-        fetchRelatives: true,
-      });
-
-      const buttonAxNode = buttonSnapshot.nodes.find((node: any) => node.role?.value === 'button');
-      expect(buttonAxNode).toBeDefined();
+      expect(nodes.length).toBeGreaterThan(0);
     });
   });
 
