@@ -1,5 +1,5 @@
 import {describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi, chai} from 'vitest';
-import {type LocatorSelectors, utils, cdp} from 'vitest/browser';
+import {type LocatorSelectors, page, utils, cdp} from 'vitest/browser';
 import {fixture, fixtureCleanup} from '@open-wc/testing-helpers';
 import {chaiA11yAxe} from 'chai-a11y-axe';
 import {getDiffableHTML} from '@open-wc/semantic-dom-diff/get-diffable-html.js';
@@ -59,11 +59,17 @@ describe('Lit Component testing', () => {
       fixtureCleanup();
     });
 
-    it('has a default heading "Hey there" and counter 5', () => {
-      const button = elLocator.getByText('Counter: 5').query();
-      const heading = elLocator.getByText('Hello, Hey there!').query();
-      expect(button).toBeTruthy();
-      expect(heading).toBeTruthy();
+    it('has a default heading "Hey there" and counter 5', async () => {
+      const heading = elLocator.getByRole('heading', {
+        level: 1,
+        name: 'Hello, Hey there!',
+      });
+      const button = elLocator.getByRole('button', {
+        name: 'Counter: 5',
+      });
+
+      await expect.element(heading).toHaveAccessibleName('Hello, Hey there!');
+      await expect.element(button).toHaveAccessibleName('Counter: 5');
     });
 
     it('SHADOW DOM - Structure test', () => {
@@ -76,6 +82,16 @@ describe('Lit Component testing', () => {
 
     it('a11y', async () => {
       await expect(el).accessible();
+    });
+
+    it('exposes its composed ARIA tree', async () => {
+      // const ariaTree = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
+
+      await expect.element(page.elementLocator(el)).toMatchAriaInlineSnapshot(`
+       - heading "Hello, Hey there!" [level=1]
+       - button "Counter: 5"
+       - text: light-dom
+     `);
     });
 
     it('exposes accessible content in the accessibility tree', async () => {
@@ -106,16 +122,16 @@ describe('Lit Component testing', () => {
     });
 
     it('should increment value on click', async () => {
-      const button = elLocator.getByText('Counter: 5');
-      const elButton = button.query()!;
+      const button = elLocator.getByRole('button');
+
+      await expect.element(button).toHaveAccessibleName('Counter: 5');
       await button.dblClick();
-      await el.updateComplete;
-      expect(elButton.textContent).toContain('Counter: 7');
+      await expect.element(button).toHaveAccessibleName('Counter: 7');
     });
 
     it('counterchange event is dispatched - sinon', async () => {
       const spyEvent = spy(el, 'dispatchEvent');
-      const button = elLocator.getByText('Counter: 5');
+      const button = elLocator.getByRole('button', {name: 'Counter: 5', exact: true});
       await button.click();
       const calledWithCounterChange = spyEvent.calledWith(match.has('type', 'counterchange'));
       expect(calledWithCounterChange).toBe(true);
@@ -123,7 +139,7 @@ describe('Lit Component testing', () => {
 
     it('counterchange event is dispatched - vi', async () => {
       const spyEvent = vi.spyOn(el, 'dispatchEvent');
-      const button = elLocator.getByText('Counter: 5');
+      const button = elLocator.getByRole('button', {name: 'Counter: 5', exact: true});
       await button.click();
       expect(spyEvent).toHaveBeenCalledWith(expect.objectContaining({type: 'counterchange'}));
     });
