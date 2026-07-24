@@ -239,3 +239,51 @@ Vitest Beta
   * Fix external module resolve error with deps optimizer query for encoded URI  \-  by [**@SveLil**](https://github.com/SveLil) in [\#10658](https://github.com/vitest-dev/vitest/pull/10658) [(90c4e)](https://github.com/vitest-dev/vitest/commit/90c4ed4cd)
 
     **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-beta.5...v5.0.0-beta.6)**
+
+[**v5.0.0-beta.7**](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0-beta.7)
+  **Breaking Changes**
+
+* Separate config resolution from the server creation  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10554](https://github.com/vitest-dev/vitest/pull/10554) [(1c0ec)](https://github.com/vitest-dev/vitest/commit/1c0ec3444)
+
+   **Features**
+
+* Add toggable injectCjsGlobals option  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10709](https://github.com/vitest-dev/vitest/pull/10709) [(82671)](https://github.com/vitest-dev/vitest/commit/826714ece)
+* Promote fsModuleCache to a top-level option  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10734](https://github.com/vitest-dev/vitest/pull/10734) [(78ed7)](https://github.com/vitest-dev/vitest/commit/78ed73afd)
+* Support non-ascii characters in for/each title placeholders  \-  by [**@k-yle**](https://github.com/k-yle) in [\#10773](https://github.com/vitest-dev/vitest/pull/10773) [(15e0a)](https://github.com/vitest-dev/vitest/commit/15e0af953)
+* **benchmark**: Add pluggable benchmark provider API  \-  by [**@GuillaumeLagrange**](https://github.com/GuillaumeLagrange) and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10799](https://github.com/vitest-dev/vitest/pull/10799) [(86c70)](https://github.com/vitest-dev/vitest/commit/86c700ed8)
+
+   **Bug Fixes**
+
+* Disable server HMR before plugins read it in their config hook  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10731](https://github.com/vitest-dev/vitest/pull/10731) [(e060b)](https://github.com/vitest-dev/vitest/commit/e060b8fa9)
+* Close the pool before the Vite servers  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10725](https://github.com/vitest-dev/vitest/pull/10725) [(96fa6)](https://github.com/vitest-dev/vitest/commit/96fa6d73d)
+* Remove listeners in the typecheck worker's off  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10741](https://github.com/vitest-dev/vitest/pull/10741) [(d758b)](https://github.com/vitest-dev/vitest/commit/d758b4755)
+* Keep per-file isolation in vm pools when maxWorkers is 1  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10743](https://github.com/vitest-dev/vitest/pull/10743) [(83ab9)](https://github.com/vitest-dev/vitest/commit/83ab9a44f)
+* Node.js 20 deprecation warning for ci.yml  \-  by [**@hirehamir**](https://github.com/hirehamir) in [\#10759](https://github.com/vitest-dev/vitest/pull/10759) [(2127f)](https://github.com/vitest-dev/vitest/commit/2127fa6ce)
+* Prevent node builtins double prefix  \-  by [**@malobre**](https://github.com/malobre) in [\#10630](https://github.com/vitest-dev/vitest/issues/10630) and [\#10767](https://github.com/vitest-dev/vitest/pull/10767) [(22d35)](https://github.com/vitest-dev/vitest/commit/22d353a80)
+* Set non-zero exit code when teardown throws during close  \-  by [**@zakcutner**](https://github.com/zakcutner) and [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10794](https://github.com/vitest-dev/vitest/pull/10794) [(22116)](https://github.com/vitest-dev/vitest/commit/22116feb7)
+* Don't race the typechecker spawn grace period on windows  \-  by [**@xevrion**](https://github.com/xevrion) in [\#10814](https://github.com/vitest-dev/vitest/pull/10814) [(b19e5)](https://github.com/vitest-dev/vitest/commit/b19e5ece9)
+* **browser**:
+  * Preserve pre-transform request defaults  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10748](https://github.com/vitest-dev/vitest/pull/10748) [(b6060)](https://github.com/vitest-dev/vitest/commit/b60605ca7)
+  * Fix error stacktrace location off-by-one  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#10724](https://github.com/vitest-dev/vitest/pull/10724) [(62b8d)](https://github.com/vitest-dev/vitest/commit/62b8d3b36)
+  * Inlined awaited import should not trigger syntax error after transform  \-  by [**@smeng9**](https://github.com/smeng9), **Shaoyu Meng** and **Claude Opus 4.8 (1M context)** in [\#10784](https://github.com/vitest-dev/vitest/pull/10784) [(51acd)](https://github.com/vitest-dev/vitest/commit/51acd5778)
+  * Mock window.print to avoid hanging  \-  by [**@aaravjaichand**](https://github.com/aaravjaichand) in [\#7375](https://github.com/vitest-dev/vitest/issues/7375) and [\#10798](https://github.com/vitest-dev/vitest/pull/10798) [(66d95)](https://github.com/vitest-dev/vitest/commit/66d95af84)
+* **pool**:
+  * Vm pools to respect cgroupsv2 memory limit  \-  by [**@milas**](https://github.com/milas) in [\#10721](https://github.com/vitest-dev/vitest/pull/10721) [(3923c)](https://github.com/vitest-dev/vitest/commit/3923cab3d)
+
+   **Performance**
+
+* Serve warm modules to workers in one round-trip, enable the node compile cache  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10708](https://github.com/vitest-dev/vitest/pull/10708) [(b144a)](https://github.com/vitest-dev/vitest/commit/b144ab56e)
+* Make the Node compile cache opt-in, persist worker caches on teardown  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10742](https://github.com/vitest-dev/vitest/pull/10742) [(941bc)](https://github.com/vitest-dev/vitest/commit/941bc8361)
+* Reuse compiled code across vm pool contexts and prewarm the module graph  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10744](https://github.com/vitest-dev/vitest/pull/10744) [(d8b04)](https://github.com/vitest-dev/vitest/commit/d8b040c63)
+* Bundle vitest's own dependencies  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10685](https://github.com/vitest-dev/vitest/pull/10685) [(c0508)](https://github.com/vitest-dev/vitest/commit/c050842b6)
+* **browser**:
+  * Open browser sessions adaptively instead of maxWorkers upfront  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10726](https://github.com/vitest-dev/vitest/pull/10726) [(6db8d)](https://github.com/vitest-dev/vitest/commit/6db8de2e2)
+  * Cut per-file round trips  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10730](https://github.com/vitest-dev/vitest/pull/10730) [(3feef)](https://github.com/vitest-dev/vitest/commit/3feefd9e2)
+  * Stop serving framework sourcemaps in headless runs  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10728](https://github.com/vitest-dev/vitest/pull/10728) [(6aefb)](https://github.com/vitest-dev/vitest/commit/6aefb3d91)
+  * Prewarm the browser while the Vite server starts  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10727](https://github.com/vitest-dev/vitest/pull/10727) [(c1767)](https://github.com/vitest-dev/vitest/commit/c17677a83)
+  * Pre-bundle the vitest runtime in optimizeDeps  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10713](https://github.com/vitest-dev/vitest/pull/10713) [(de631)](https://github.com/vitest-dev/vitest/commit/de63174f5)
+* **coverage**:
+  * Speed up v8 report generation (bounded-memory merge \+ precompiled globs)  \-  by [**@toxik**](https://github.com/toxik), **Claude Opus 4.8 (1M context)** and [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10506](https://github.com/vitest-dev/vitest/pull/10506) [(b05e5)](https://github.com/vitest-dev/vitest/commit/b05e5d634)
+  * Reduce RPC data and unnecessary serializations  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10781](https://github.com/vitest-dev/vitest/pull/10781) [(7e7e3)](https://github.com/vitest-dev/vitest/commit/7e7e35cb4)
+
+    **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-beta.6...v5.0.0-beta.7)**
