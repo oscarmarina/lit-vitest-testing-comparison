@@ -3,17 +3,16 @@
     "allowArbitraryExtensions": true,
     "declaration": true,
     "declarationDir": "./dist/",
-    "declarationMap": true,
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "lib": [
-      "es2022",
+      "es2023",
       "DOM",
       "DOM.Iterable"
     ],
-    "module": "es2022",
+    "module": "esnext",
     "moduleResolution": "Bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
@@ -25,11 +24,11 @@
     "resolveJsonModule": true,
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
-    "rootDir": "./src/",
+    "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
     "stripInternal": true,
-    "target": "es2022",
+    "target": "es2023",
     "types": [
       "mocha"
     ],
@@ -37,6 +36,7 @@
     "verbatimModuleSyntax": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "test/**/*.ts"
   ]
 }

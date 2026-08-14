@@ -287,3 +287,66 @@ Vitest Beta
   * Reduce RPC data and unnecessary serializations  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10781](https://github.com/vitest-dev/vitest/pull/10781) [(7e7e3)](https://github.com/vitest-dev/vitest/commit/7e7e35cb4)
 
     **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-beta.6...v5.0.0-beta.7)**
+
+[**v5.0.0-rc.1**](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0-rc.1)
+   **Breaking Changes**
+
+* Inline projects extend the root config by default  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10750](https://github.com/vitest-dev/vitest/pull/10750) [(fec00)](https://github.com/vitest-dev/vitest/commit/fec001ad3)
+* Enable mocking Temporal without fake timers  \-  by [**@fabon-f**](https://github.com/fabon-f), **Hiroshi Ogawa** and **OpenCode** in [\#10757](https://github.com/vitest-dev/vitest/pull/10757) [(ac2d4)](https://github.com/vitest-dev/vitest/commit/ac2d46b42)
+* Support nested projects  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10846](https://github.com/vitest-dev/vitest/pull/10846) [(ec367)](https://github.com/vitest-dev/vitest/commit/ec367cf2a)
+* Use \> as separator in \-t, calculate only once  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10686](https://github.com/vitest-dev/vitest/pull/10686) [(a0b20)](https://github.com/vitest-dev/vitest/commit/a0b20bc86)
+* Fail the test when an asynchronous assertion is not awaited  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10868](https://github.com/vitest-dev/vitest/pull/10868) [(86d4a)](https://github.com/vitest-dev/vitest/commit/86d4a9da9)
+* Share the Vite server between inline projects  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10848](https://github.com/vitest-dev/vitest/pull/10848) [(d87c9)](https://github.com/vitest-dev/vitest/commit/d87c96ee4)
+* **browser**: Save failure screenshots in attachmentsDir  \-  by [**@macarie**](https://github.com/macarie) in [\#10917](https://github.com/vitest-dev/vitest/pull/10917) [(3b5bb)](https://github.com/vitest-dev/vitest/commit/3b5bbd8b4)
+* **spy**: Preserve class mock prototype methods on instances  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10910](https://github.com/vitest-dev/vitest/pull/10910) [(6093d)](https://github.com/vitest-dev/vitest/commit/6093d764a)
+* **types**: Add better promise support in expects and matchers  \-  by [**@samchungy**](https://github.com/samchungy) and [**@sheremet-va**](https://github.com/sheremet-va) in [\#8266](https://github.com/vitest-dev/vitest/pull/8266) [(41f55)](https://github.com/vitest-dev/vitest/commit/41f551bce)
+
+   **Features**
+
+* Report the duration breakdown as percentages  \-  by [**@sheremet-va**](https://github.com/sheremet-va) and [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10820](https://github.com/vitest-dev/vitest/pull/10820) [(c67d2)](https://github.com/vitest-dev/vitest/commit/c67d296f4)
+* **cli**: Support \-p shorthand for \--project  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10826](https://github.com/vitest-dev/vitest/pull/10826) [(1addd)](https://github.com/vitest-dev/vitest/commit/1adddde12)
+* **vm**: Support require(esm) in vm pools  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10829](https://github.com/vitest-dev/vitest/pull/10829) [(01298)](https://github.com/vitest-dev/vitest/commit/01298e5b3)
+
+	**Bug Fixes**
+
+* Coalesce concurrent watch-mode restarts, deflake the pool stderr fixture  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10822](https://github.com/vitest-dev/vitest/pull/10822) [(a31f8)](https://github.com/vitest-dev/vitest/commit/a31f86af7)
+* Prevent vitest \--typecheck from reporting a false success when the tsc process crashes  \-  by [**@hitenkalda**](https://github.com/hitenkalda) and **Hiten Kalda** in [\#10705](https://github.com/vitest-dev/vitest/pull/10705) [(a1b05)](https://github.com/vitest-dev/vitest/commit/a1b0565c9)
+* Collect in-source tests when the module is cached  \-  by [**@koutaro-masaki**](https://github.com/koutaro-masaki) in [\#10577](https://github.com/vitest-dev/vitest/issues/10577) and [\#10589](https://github.com/vitest-dev/vitest/pull/10589) [(a7bf2)](https://github.com/vitest-dev/vitest/commit/a7bf2b2c8)
+* Swap replace() arguments so timeout error stack shows the real message  \-  by [**@lazerg**](https://github.com/lazerg) in [\#10875](https://github.com/vitest-dev/vitest/pull/10875) [(aba0f)](https://github.com/vitest-dev/vitest/commit/aba0f9b7b)
+* Stale mock metadata breaks automocking with isolate:false  \-  by [**@kade-robertson**](https://github.com/kade-robertson) in [\#10145](https://github.com/vitest-dev/vitest/issues/10145) and [\#10541](https://github.com/vitest-dev/vitest/pull/10541) [(8e210)](https://github.com/vitest-dev/vitest/commit/8e2108dda)
+* Don't lose worker output on teardown, deflake timing-sensitive tests  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10842](https://github.com/vitest-dev/vitest/pull/10842) [(1216b)](https://github.com/vitest-dev/vitest/commit/1216b5af9)
+* **browser**:
+  * Ignore channel events in a tester opened as a top-level window  \-  by [**@simshanith**](https://github.com/simshanith) in [\#9379](https://github.com/vitest-dev/vitest/issues/9379) and [\#9381](https://github.com/vitest-dev/vitest/pull/9381) [(46a3c)](https://github.com/vitest-dev/vitest/commit/46a3cf750)
+  * Resolve connectTimeout from the project config  \-  by [**@lazerg**](https://github.com/lazerg) in [\#10879](https://github.com/vitest-dev/vitest/issues/10879) and [\#10880](https://github.com/vitest-dev/vitest/pull/10880) [(62c79)](https://github.com/vitest-dev/vitest/commit/62c795d63)
+  * Prebundle vite module runner with vitest  \-  by [**@lebovvskii**](https://github.com/lebovvskii) and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10836](https://github.com/vitest-dev/vitest/issues/10836) and [\#10856](https://github.com/vitest-dev/vitest/pull/10856) [(37c24)](https://github.com/vitest-dev/vitest/commit/37c240158)
+  * Restore dependency reload warning  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#10913](https://github.com/vitest-dev/vitest/pull/10913) [(90d69)](https://github.com/vitest-dev/vitest/commit/90d696d44)
+  * Configure internal optimizer dependencies  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#10915](https://github.com/vitest-dev/vitest/pull/10915) [(a72f4)](https://github.com/vitest-dev/vitest/commit/a72f46eac)
+* **cache**:
+  * Improve fsModuleCache resiliency during external modifications  \-  by [**@jszumski**](https://github.com/jszumski) in [\#10869](https://github.com/vitest-dev/vitest/pull/10869) [(5eb35)](https://github.com/vitest-dev/vitest/commit/5eb3570e8)
+* **cli**:
+  * Exit on CTRL+c even when globalSetup runs blocked code  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10863](https://github.com/vitest-dev/vitest/pull/10863) [(d568f)](https://github.com/vitest-dev/vitest/commit/d568f8ce3)
+* **deps**:
+  * Update all non-major dependencies  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#9958](https://github.com/vitest-dev/vitest/pull/9958) [(7faa7)](https://github.com/vitest-dev/vitest/commit/7faa7b04a)
+  * Update all non-major dependencies  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10861](https://github.com/vitest-dev/vitest/pull/10861) [(0188c)](https://github.com/vitest-dev/vitest/commit/0188c8135)
+  * Update all non-major dependencies  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10898](https://github.com/vitest-dev/vitest/pull/10898) [(61c4b)](https://github.com/vitest-dev/vitest/commit/61c4b8024)
+* **expect**:
+  * Handle nullish toHaveProperty values  \-  by [**@liyimil**](https://github.com/liyimil) in [\#10735](https://github.com/vitest-dev/vitest/issues/10735) and [\#10811](https://github.com/vitest-dev/vitest/pull/10811) [(99e59)](https://github.com/vitest-dev/vitest/commit/99e596d33)
+* **reporters**:
+  * Print parent describe suites when the passed-test list is hidden  \-  by [**@ChihebBENCHEIKH1**](https://github.com/ChihebBENCHEIKH1), **Chiheb Bencheikh** and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10606](https://github.com/vitest-dev/vitest/issues/10606) and [\#10768](https://github.com/vitest-dev/vitest/pull/10768) [(658af)](https://github.com/vitest-dev/vitest/commit/658affeb3)
+* **runner**:
+  * Don't fail collection when accessing error.stack throws  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10839](https://github.com/vitest-dev/vitest/pull/10839) [(202e2)](https://github.com/vitest-dev/vitest/commit/202e27f3d)
+* **spy**:
+  * Point ESM namespace spy error to module mocking docs  \-  by [**@ryandiginomad**](https://github.com/ryandiginomad) and **Ryan Tang** in [\#10707](https://github.com/vitest-dev/vitest/pull/10707) [(d6cec)](https://github.com/vitest-dev/vitest/commit/d6ceca9d7)
+* **typecheck**:
+  * Report a checker crash on Windows instead of a spawn failure  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10907](https://github.com/vitest-dev/vitest/pull/10907) [(77aac)](https://github.com/vitest-dev/vitest/commit/77aac87dd)
+* **vitest**:
+  * Remove broken "./src/\*" export from package.json  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10918](https://github.com/vitest-dev/vitest/pull/10918) [(2e5df)](https://github.com/vitest-dev/vitest/commit/2e5df7543)
+* **vm**:
+  * Stop retaining every finished test file in vm pool workers  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10854](https://github.com/vitest-dev/vitest/pull/10854) [(38503)](https://github.com/vitest-dev/vitest/commit/3850323e2)
+
+   **Performance**
+
+* Lowers peak memory usage when using \--changed on a large graph  \-  by [**@jszumski**](https://github.com/jszumski) in [\#10866](https://github.com/vitest-dev/vitest/pull/10866) [(9f23f)](https://github.com/vitest-dev/vitest/commit/9f23f8ec3)
+* **browser**: Serve framework assets as immutable  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10729](https://github.com/vitest-dev/vitest/pull/10729) [(7af87)](https://github.com/vitest-dev/vitest/commit/7af8755ae)
+
+    **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-beta.7...v5.0.0-rc.1)**
