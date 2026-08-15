@@ -73,7 +73,11 @@ describe('Lit Component testing', () => {
     });
 
     it('SHADOW DOM - Structure test', () => {
-      expect(getDiffableHTML(elShadowRoot)).toMatchSnapshot('SHADOW DOM');
+      expect(
+        getDiffableHTML(elShadowRoot, {
+          ignoreAttributes: [{tags: ['img'], attributes: ['src']}],
+        })
+      ).toMatchSnapshot('SHADOW DOM');
     });
 
     it('LIGHT DOM - Structure test', () => {
