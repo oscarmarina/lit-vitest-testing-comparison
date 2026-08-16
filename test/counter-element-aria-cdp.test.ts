@@ -1,6 +1,7 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {cdp, page, userEvent, utils} from 'vitest/browser';
-import {html, render, LitElement} from 'lit';
+import {html} from 'lit';
+import {fixture, fixtureCleanup} from '@open-wc/testing-helpers';
 import type {CounterElement} from '../src/CounterElement.js';
 import type {FocusStepper} from '../src/FocusStepper.js';
 import '../src/define/counter-element.js';
@@ -10,33 +11,14 @@ import '../src/define/focus-stepper.js';
 /*  Helpers                                                                   */
 /* -------------------------------------------------------------------------- */
 
-let container: HTMLDivElement | undefined;
-
-async function mountLit<T extends HTMLElement>(template: ReturnType<typeof html>): Promise<T> {
-  container?.remove();
-  container = document.createElement('div');
-  document.body.append(container);
-  render(template, container);
-  const el = container.firstElementChild as T | null;
-  const litEl = el as unknown as LitElement | undefined;
-  await litEl?.updateComplete;
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-  return el as T;
-}
-
-async function unmountLit() {
-  container?.remove();
-  container = undefined;
-}
-
-function mountCounter(): Promise<CounterElement> {
-  return mountLit<CounterElement>(html`
+async function mountCounter(): Promise<CounterElement> {
+  return fixture<CounterElement>(html`
     <counter-element>light-dom</counter-element>
   `);
 }
 
-function mountStepper(): Promise<FocusStepper> {
-  return mountLit<FocusStepper>(html`
+async function mountStepper(): Promise<FocusStepper> {
+  return fixture<FocusStepper>(html`
     <focus-stepper></focus-stepper>
   `);
 }
@@ -101,7 +83,7 @@ function axValue(node: AXNode): unknown {
 
 describe('ARIA locators pierce nested Shadow DOM', () => {
   beforeEach(mountCounter);
-  afterEach(unmountLit);
+  afterEach(fixtureCleanup);
 
   it('finds the internal <h1> by role, level and accessible name', async () => {
     const heading = page.getByRole('heading', {level: 1, name: 'Hello, Hey there!'});
@@ -131,15 +113,17 @@ describe('ARIA locators pierce nested Shadow DOM', () => {
 });
 
 describe('Interactive accessibility state changes', () => {
-  beforeEach(mountStepper);
-  afterEach(unmountLit);
+  let el: FocusStepper;
+  beforeEach(async () => {
+    el = await mountStepper();
+  });
+  afterEach(fixtureCleanup);
 
   it('tracks aria-expanded transitions with the expanded filter', async () => {
     const collapsed = page.getByRole('button', {name: 'Show session panel', expanded: false});
     await expect.element(collapsed).toBeVisible();
 
     await userEvent.click(collapsed);
-    const el = container?.firstElementChild as FocusStepper;
     await el.updateComplete;
 
     expect(
@@ -151,7 +135,6 @@ describe('Interactive accessibility state changes', () => {
   });
 
   it('collapses the panel and hides the inner controls again', async () => {
-    const el = container?.firstElementChild as FocusStepper;
     await userEvent.click(page.getByRole('button', {name: 'Show session panel'}));
     await el.updateComplete;
     await expect.element(page.getByRole('progressbar', {name: 'Session progress'})).toBeVisible();
@@ -166,7 +149,6 @@ describe('Interactive accessibility state changes', () => {
   });
 
   it('filters by disabled state', async () => {
-    const el = container?.firstElementChild as FocusStepper;
     await userEvent.click(page.getByRole('button', {name: 'Show session panel'}));
     await el.updateComplete;
 
@@ -203,7 +185,6 @@ describe('Interactive accessibility state changes', () => {
   });
 
   it('propagates value changes into aria-valuenow and the live region', async () => {
-    const el = container?.firstElementChild as FocusStepper;
     await userEvent.click(page.getByRole('button', {name: 'Show session panel'}));
     await el.updateComplete;
 
@@ -227,7 +208,7 @@ describe('Interactive accessibility state changes', () => {
   });
 
   it('reflects counter changes in the accessible name of the material button', async () => {
-    await unmountLit();
+    fixtureCleanup();
     await mountCounter();
     await userEvent.click(page.getByRole('button', {name: 'Counter: 5'}));
     await expect
@@ -237,7 +218,7 @@ describe('Interactive accessibility state changes', () => {
 });
 
 describe('Real user interactions (userEvent)', () => {
-  afterEach(unmountLit);
+  afterEach(fixtureCleanup);
 
   it('increments with a real pointer click and double click', async () => {
     await mountCounter();
@@ -308,7 +289,7 @@ describe('Real user interactions (userEvent)', () => {
 });
 
 describe('CDP deep dive (Chromium only)', () => {
-  afterEach(unmountLit);
+  afterEach(fixtureCleanup);
 
   it('audits the live progressbar AX node and its valuenow over time', async () => {
     const el = await mountStepper();
@@ -467,11 +448,13 @@ describe('CDP deep dive (Chromium only)', () => {
 });
 
 describe('Accessibility tree snapshots & matching', () => {
-  beforeEach(mountStepper);
-  afterEach(unmountLit);
+  let el: FocusStepper;
+  beforeEach(async () => {
+    el = await mountStepper();
+  });
+  afterEach(fixtureCleanup);
 
   it('exposes the composed ARIA tree as an inline snapshot', async () => {
-    const el = container?.firstElementChild as FocusStepper;
     await userEvent.click(page.getByRole('button', {name: 'Show session panel'}));
     await el.updateComplete;
 
@@ -485,7 +468,6 @@ describe('Accessibility tree snapshots & matching', () => {
   });
 
   it('renders the ARIA tree programmatically and tracks updates', async () => {
-    const el = container?.firstElementChild as FocusStepper;
     await userEvent.click(page.getByRole('button', {name: 'Show session panel'}));
     await el.updateComplete;
 
@@ -502,7 +484,7 @@ describe('Accessibility tree snapshots & matching', () => {
   });
 
   it('keeps matcher-computed and CDP-computed accessible names in sync', async () => {
-    await unmountLit();
+    fixtureCleanup();
     await mountCounter();
 
     await expect

@@ -75,10 +75,9 @@ El archivo tiene **24 tests** organizados en **5 bloques `describe`**:
 
 Además hay una sección de **helpers** reutilizables:
 
-- `mountLit` / `unmountLit`: montan y desmontan un componente Lit dentro de un
-  contenedor, esperando a `updateComplete` y a un `requestAnimationFrame`
-  (para asegurar que el render y el layout ya están listos).
-- `mountCounter` / `mountStepper`: atajos para montar cada componente.
+- `mountCounter` / `mountStepper`: montan cada componente mediante `fixture` de
+  `@open-wc/testing-helpers`, que espera el `updateComplete` del elemento.
+  `afterEach(fixtureCleanup)` elimina los fixtures montados tras cada test.
 - `axNodeAtPoint`: la pieza clave de CDP (se explica en la sección 6).
 - `axFind`, `axProperty`, `axValue`: utilidades para navegar los nodos del
   árbol AX devuelto por CDP.

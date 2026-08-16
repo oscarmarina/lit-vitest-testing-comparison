@@ -110,9 +110,9 @@ propiedades y valor actual) — la caché AX real del navegador, independiente d
 tus lecturas del DOM. Helper completo en `test/counter-element-aria-cdp.test.ts`
 (`axNodeAtPoint`).
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:69` (helper),
-`test/counter-element-aria-cdp.test.ts:358` (test `getFullAXTree`),
-`test/counter-element-aria-cdp.test.ts:312` (auditoría del progressbar).
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:52` (helper),
+`test/counter-element-aria-cdp.test.ts:340` (test `getFullAXTree`),
+`test/counter-element-aria-cdp.test.ts:294` (auditoría del progressbar).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
 
@@ -138,8 +138,8 @@ const axProperty = (node, name) =>
   node.properties?.find((p) => p.name === name)?.value?.value; // valuemin/max/focusable
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:93` (helper `axValue`),
-`:312` (auditoría con valor inicial 3 y tras interacción 4).
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:76` (helper `axValue`),
+`:294` (auditoría con valor inicial 3 y tras interacción 4).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
 
@@ -164,7 +164,7 @@ await expect
   .toHaveAttribute('aria-disabled', 'true');
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:167` (`filters by
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:151` (`filters by
 disabled state`). Nota: el componente `src/FocusStepper.ts` desactiva
 `lit-a11y/role-supports-aria-attr` porque usa `aria-disabled` en un `progressbar`
 de forma deliberada.
@@ -201,7 +201,7 @@ const {node} = await client.send('DOM.describeNode', {nodeId});
 expect(node.localName).toBe('button');
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:369` (`pierces nested
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:351` (`pierces nested
 shadow roots in the DOM domain snapshot`).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
@@ -226,9 +226,9 @@ await userEvent.tab();
 expect(el.shadowRoot?.activeElement?.id).toBe('toggle');
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:250` (activación con
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:232` (activación con
 Space/Enter y gestión de foco),
-`test/counter-element-aria-cdp.test.ts:271` (flechas sobre el progressbar).
+`test/counter-element-aria-cdp.test.ts:253` (flechas sobre el progressbar).
 
 **Verificado en.** `5.0.0-rc.1`.
 
@@ -247,7 +247,7 @@ iframe del test.
 de `vitest/browser`, que inyecta los eventos dentro del iframe correcto.
 Reserva CDP `Input.*` para **puntero**, que sí funciona (F8).
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:250`, `:271`
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:232`, `:253`
 (teclado vía `userEvent`).
 
 **Verificado en.** `5.0.0-rc.1`.
@@ -271,7 +271,7 @@ await client.send('Input.dispatchMouseEvent', {type: 'mouseReleased', x, y, butt
 Útil cuando necesitas el clic "de sistema" (p. ej. para verificar que el árbol
 AX del navegador refleja el nuevo estado, independiente del matcher).
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:398` (`drives a real
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:380` (`drives a real
 pointer click with raw Input.dispatchMouseEvent`).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
@@ -299,7 +299,7 @@ expect(matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(true);
 await client.send('Emulation.setEmulatedMedia', {media: '', features: []});
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:430` (`emulates
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:412` (`emulates
 prefers-reduced-motion and forced-colors at the protocol level`).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
@@ -323,7 +323,7 @@ const tree = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
 expect(tree).toContain('- text: light-dom');
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:120` (`prunes aria-hidden
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:103` (`prunes aria-hidden
 nodes but keeps composed slotted light DOM`).
 
 **Verificado en.** `5.0.0-rc.1`.
@@ -354,9 +354,9 @@ ARIA completo** del componente con un snapshot literal, incluyendo el texto con
 - status
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:101` (bloque de locators),
-`test/counter-element-aria-cdp.test.ts:477` (`toMatchAriaInlineSnapshot`),
-`test/counter-element-aria-cdp.test.ts:486` (árbol programático).
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:84` (bloque de locators),
+`test/counter-element-aria-cdp.test.ts:461` (`toMatchAriaInlineSnapshot`),
+`test/counter-element-aria-cdp.test.ts:470` (árbol programático).
 
 **Verificado en.** `5.0.0-rc.1`.
 

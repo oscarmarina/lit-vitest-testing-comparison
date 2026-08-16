@@ -108,9 +108,9 @@ This returns the element's **live AX node** (role, computed name, properties and
 current value) — the browser's real AX cache, independent of your DOM reads.
 Full helper in `test/counter-element-aria-cdp.test.ts` (`axNodeAtPoint`).
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:69` (helper),
-`test/counter-element-aria-cdp.test.ts:358` (`getFullAXTree` test),
-`test/counter-element-aria-cdp.test.ts:312` (progressbar audit).
+**Evidence.** `test/counter-element-aria-cdp.test.ts:52` (helper),
+`test/counter-element-aria-cdp.test.ts:340` (`getFullAXTree` test),
+`test/counter-element-aria-cdp.test.ts:294` (progressbar audit).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
 
@@ -136,8 +136,8 @@ const axProperty = (node, name) =>
   node.properties?.find((p) => p.name === name)?.value?.value; // valuemin/max/focusable
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:93` (helper `axValue`),
-`:312` (audit with initial value 3 and value 4 after interaction).
+**Evidence.** `test/counter-element-aria-cdp.test.ts:76` (helper `axValue`),
+`:294` (audit with initial value 3 and value 4 after interaction).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
 
@@ -163,7 +163,7 @@ await expect
   .toHaveAttribute('aria-disabled', 'true');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:167` (`filters by disabled
+**Evidence.** `test/counter-element-aria-cdp.test.ts:151` (`filters by disabled
 state`). Note: the `src/FocusStepper.ts` component disables
 `lit-a11y/role-supports-aria-attr` because it deliberately uses `aria-disabled`
 on a `progressbar`.
@@ -200,7 +200,7 @@ const {node} = await client.send('DOM.describeNode', {nodeId});
 expect(node.localName).toBe('button');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:369` (`pierces nested
+**Evidence.** `test/counter-element-aria-cdp.test.ts:351` (`pierces nested
 shadow roots in the DOM domain snapshot`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -225,9 +225,9 @@ await userEvent.tab();
 expect(el.shadowRoot?.activeElement?.id).toBe('toggle');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:250` (Space/Enter activation
+**Evidence.** `test/counter-element-aria-cdp.test.ts:232` (Space/Enter activation
 and focus management),
-`test/counter-element-aria-cdp.test.ts:271` (arrows on the progressbar).
+`test/counter-element-aria-cdp.test.ts:253` (arrows on the progressbar).
 
 **Verified in.** `5.0.0-rc.1`.
 
@@ -246,7 +246,7 @@ test iframe.
 `vitest/browser`, which injects events inside the correct iframe. Reserve CDP
 `Input.*` for **pointer**, which does work (F8).
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:250`, `:271`
+**Evidence.** `test/counter-element-aria-cdp.test.ts:232`, `:253`
 (keyboard via `userEvent`).
 
 **Verified in.** `5.0.0-rc.1`.
@@ -269,7 +269,7 @@ await client.send('Input.dispatchMouseEvent', {type: 'mouseReleased', x, y, butt
 Useful when you need the "system" click (e.g. to verify the browser's AX tree
 reflects the new state, independent of the matcher).
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:398` (`drives a real
+**Evidence.** `test/counter-element-aria-cdp.test.ts:380` (`drives a real
 pointer click with raw Input.dispatchMouseEvent`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -297,7 +297,7 @@ expect(matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(true);
 await client.send('Emulation.setEmulatedMedia', {media: '', features: []});
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:430` (`emulates
+**Evidence.** `test/counter-element-aria-cdp.test.ts:412` (`emulates
 prefers-reduced-motion and forced-colors at the protocol level`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -320,7 +320,7 @@ const tree = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
 expect(tree).toContain('- text: light-dom');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:120` (`prunes aria-hidden
+**Evidence.** `test/counter-element-aria-cdp.test.ts:103` (`prunes aria-hidden
 nodes but keeps composed slotted light DOM`).
 
 **Verified in.** `5.0.0-rc.1`.
@@ -351,9 +351,9 @@ text:
 - status
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:101` (locators block),
-`test/counter-element-aria-cdp.test.ts:477` (`toMatchAriaInlineSnapshot`),
-`test/counter-element-aria-cdp.test.ts:486` (programmatic tree).
+**Evidence.** `test/counter-element-aria-cdp.test.ts:84` (locators block),
+`test/counter-element-aria-cdp.test.ts:461` (`toMatchAriaInlineSnapshot`),
+`test/counter-element-aria-cdp.test.ts:470` (programmatic tree).
 
 **Verified in.** `5.0.0-rc.1`.
 
