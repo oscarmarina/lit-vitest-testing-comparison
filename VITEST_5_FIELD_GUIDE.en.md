@@ -108,7 +108,7 @@ Browser Tester" + your components). `DOM.getNodeForLocation` also reports the
 coordinates.
 
 For a **specific node**, `getPartialAXTree`/`queryAXTree` need a node anchor;
-`getNodeAtLocation` (the "node under the cursor" trick) provides it via
+`getCDPNodeForElement` (the "node under the cursor" trick) provides it via
 `DOM.getNodeForLocation`, and `getPartialAXTree` returns the local AX subtree:
 
 ```ts
@@ -125,10 +125,10 @@ const {nodes} = await client.send('Accessibility.getPartialAXTree', {
 This returns the element's **live AX node** (role, computed name, properties and
 current value) — the browser's real AX cache, independent of your DOM reads.
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:84` (helper
-`getFullAXTree`), `test/counter-element-aria-cdp.test.ts:421`
-(`getFullAXTree({frameId})` test), `test/counter-element-aria-cdp.test.ts:103`
-(helper `getNodeAtLocation`), `test/counter-element-aria-cdp.test.ts:370`
+**Evidence.** `test/counter-element-aria-cdp.test.ts:86` (helper
+`getFullAXTree`), `test/counter-element-aria-cdp.test.ts:452`
+(`getFullAXTree({frameId})` test), `test/counter-element-aria-cdp.test.ts:105`
+(helper `getCDPNodeForElement`), `test/counter-element-aria-cdp.test.ts:372`
 (progressbar audit).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -155,8 +155,8 @@ const axProperty = (node, name) =>
   node.properties?.find((p) => p.name === name)?.value?.value; // valuemin/max/focusable
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:136` (helper `axValue`),
-`:370` (audit with initial value 3 and value 4 after interaction).
+**Evidence.** `test/counter-element-aria-cdp.test.ts:138` (helper `axValue`),
+`:372` (audit with initial value 3 and value 4 after interaction).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
 
@@ -182,7 +182,7 @@ await expect
   .toHaveAttribute('aria-disabled', 'true');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:211` (`filters by disabled
+**Evidence.** `test/counter-element-aria-cdp.test.ts:213` (`filters by disabled
 state`). Note: the `src/FocusStepper.ts` component disables
 `lit-a11y/role-supports-aria-attr` because it deliberately uses `aria-disabled`
 on a `progressbar`.
@@ -219,7 +219,7 @@ const {node} = await client.send('DOM.describeNode', {nodeId});
 expect(node.localName).toBe('button');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:438` (`pierces nested
+**Evidence.** `test/counter-element-aria-cdp.test.ts:469` (`pierces nested
 shadow roots in the DOM domain snapshot`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -244,9 +244,9 @@ await userEvent.tab();
 expect(el.shadowRoot?.activeElement?.id).toBe('toggle');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:292` (Space/Enter activation
+**Evidence.** `test/counter-element-aria-cdp.test.ts:294` (Space/Enter activation
 and focus management),
-`test/counter-element-aria-cdp.test.ts:313` (arrows on the progressbar).
+`test/counter-element-aria-cdp.test.ts:315` (arrows on the progressbar).
 
 **Verified in.** `5.0.0-rc.1`.
 
@@ -265,7 +265,7 @@ test iframe.
 `vitest/browser`, which injects events inside the correct iframe. Reserve CDP
 `Input.*` for **pointer**, which does work (F8).
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:292`, `:313`
+**Evidence.** `test/counter-element-aria-cdp.test.ts:294`, `:315`
 (keyboard via `userEvent`).
 
 **Verified in.** `5.0.0-rc.1`.
@@ -288,7 +288,7 @@ await client.send('Input.dispatchMouseEvent', {type: 'mouseReleased', x, y, butt
 Useful when you need the "system" click (e.g. to verify the browser's AX tree
 reflects the new state, independent of the matcher).
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:467` (`drives a real
+**Evidence.** `test/counter-element-aria-cdp.test.ts:498` (`drives a real
 pointer click with raw Input.dispatchMouseEvent`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -316,7 +316,7 @@ expect(matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(true);
 await client.send('Emulation.setEmulatedMedia', {media: '', features: []});
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:499` (`emulates
+**Evidence.** `test/counter-element-aria-cdp.test.ts:530` (`emulates
 prefers-reduced-motion and forced-colors at the protocol level`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -339,7 +339,7 @@ const tree = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
 expect(tree).toContain('- text: light-dom');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:163` (`prunes aria-hidden
+**Evidence.** `test/counter-element-aria-cdp.test.ts:165` (`prunes aria-hidden
 nodes but keeps composed slotted light DOM`).
 
 **Verified in.** `5.0.0-rc.1`.
@@ -370,9 +370,9 @@ text:
 - status
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:144` (locators block),
-`test/counter-element-aria-cdp.test.ts:548` (`toMatchAriaInlineSnapshot`),
-`test/counter-element-aria-cdp.test.ts:557` (programmatic tree).
+**Evidence.** `test/counter-element-aria-cdp.test.ts:146` (locators block),
+`test/counter-element-aria-cdp.test.ts:579` (`toMatchAriaInlineSnapshot`),
+`test/counter-element-aria-cdp.test.ts:588` (programmatic tree).
 
 **Verified in.** `5.0.0-rc.1`.
 

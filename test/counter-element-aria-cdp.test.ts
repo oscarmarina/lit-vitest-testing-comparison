@@ -49,10 +49,12 @@ interface FrameNode {
 }
 
 /**
- * The `cdp()` session is attached to the orchestrator page; the test runs in a
- * same-origin `<iframe name="vitest-iframe">`. Document-level AX calls without
- * a `frameId` default to the root frame (the runner + an `Iframe` node with no
- * children), so full-tree queries must target the test frame's `frameId` (F2).
+ * Vitest Browser Mode exposes a page whose root frame is the browser runner;
+ * the test document runs in a child iframe (`<iframe name="vitest-iframe">`).
+ * Resolve that child frame's `frameId` from `Page.getFrameTree`.
+ *
+ * This helper supports the topology/infrastructure tests; functional tests
+ * prefer resolving the `frameId` from the actual target element (F2).
  */
 async function getTestFrameId(): Promise<string> {
   await client.send('Page.enable');
@@ -96,11 +98,11 @@ interface CDPNodeLocation {
 }
 
 /**
- * Correlate a test-DOM element with its CDP node and frame: resolve the node
- * under the cursor at the element's center. The response reports the `frameId`
- * of the frame that owns the node, plus its `backendNodeId`/`nodeId`.
+ * Resolves a test DOM element to its corresponding CDP node and owning frame.
+ * The current implementation uses the element's center coordinates with
+ * `DOM.getNodeForLocation`, which returns the node identifiers and `frameId`.
  */
-async function getNodeAtLocation(element: Element): Promise<CDPNodeLocation> {
+async function getCDPNodeForElement(element: Element): Promise<CDPNodeLocation> {
   const rect = element.getBoundingClientRect();
   const x = Math.round(rect.x + rect.width / 2);
   const y = Math.round(rect.y + rect.height / 2);
@@ -114,7 +116,7 @@ async function getNodeAtLocation(element: Element): Promise<CDPNodeLocation> {
 
 /**
  * The local AX subtree around a backend node. `getPartialAXTree`/`queryAXTree`
- * need a node anchor; `getNodeAtLocation` supplies it.
+ * need a node anchor; `getCDPNodeForElement` supplies it.
  */
 async function getPartialAXTree(backendNodeId: number): Promise<AXNode[]> {
   const {nodes} = await client.send('Accessibility.getPartialAXTree', {
@@ -375,7 +377,7 @@ describe('CDP deep dive (Chromium only)', () => {
     // Resolve the progressbar's CDP node + frame, then audit it through the
     // test frame's full AX tree: the `frameId` reported by
     // `DOM.getNodeForLocation` is the one `getFullAXTree` targets.
-    const {frameId} = await getNodeAtLocation(
+    const {frameId} = await getCDPNodeForElement(
       page.getByRole('progressbar', {name: 'Session progress'}).element()
     );
     expect(frameId).toBeTruthy();
@@ -402,7 +404,7 @@ describe('CDP deep dive (Chromium only)', () => {
 
     // Local-subtree technique: anchor on the button's backend node and pull
     // the AX context around it with getPartialAXTree (which needs an anchor).
-    const {backendNodeId} = await getNodeAtLocation(
+    const {backendNodeId} = await getCDPNodeForElement(
       page.getByRole('button', {name: 'Counter: 5'}).element()
     );
     const buttonAx = axFind(await getPartialAXTree(backendNodeId), 'button');
@@ -411,11 +413,40 @@ describe('CDP deep dive (Chromium only)', () => {
 
     await userEvent.click(page.getByRole('button', {name: 'Counter: 5'}));
 
-    const {backendNodeId: backendNodeIdAfter} = await getNodeAtLocation(
+    const {backendNodeId: backendNodeIdAfter} = await getCDPNodeForElement(
       page.getByRole('button', {name: 'Counter: 6'}).element()
     );
     const axAfter = await getPartialAXTree(backendNodeIdAfter);
     expect(axFind(axAfter, 'button')?.name?.value).toBe('Counter: 6');
+  });
+
+  it('discovers the browser frame hierarchy (root runner + test iframe)', async () => {
+    const {frameTree} = await client.send('Page.getFrameTree');
+
+    // Stable topology assertions: a root frame plus at least one child frame,
+    // and the test document lives in a frame different from the root.
+    expect(frameTree.frame.id).toBeTruthy();
+    expect(frameTree.childFrames?.length ?? 0).toBeGreaterThan(0);
+
+    const testFrameId = await getTestFrameId();
+    expect(testFrameId).not.toBe(frameTree.frame.id);
+
+    // Documents the current Vitest Browser Mode topology: the test iframe is
+    // named "vitest-iframe". Observed behavior, not a hard dependency of the
+    // functional tests.
+    const findFrame = (node: FrameNode): FrameNode | undefined => {
+      if (node.frame?.id === testFrameId) {
+        return node;
+      }
+      for (const child of node.childFrames ?? []) {
+        const found = findFrame(child);
+        if (found) {
+          return found;
+        }
+      }
+      return undefined;
+    };
+    expect(findFrame(frameTree)?.frame?.name).toBe('vitest-iframe');
   });
 
   it('reaches the test AX tree via Accessibility.getFullAXTree({frameId})', async () => {
@@ -578,11 +609,21 @@ describe('Accessibility tree snapshots & matching', () => {
       .element(page.getByRole('button', {name: 'Counter: 5'}))
       .toHaveAccessibleName('Counter: 5');
 
-    const ax = await getFullAXTree(await getTestFrameId());
+    // Derive the owning frameId from the button itself instead of the
+    // hard-coded iframe name: functional tests stay decoupled from Vitest's
+    // internal frame topology.
+    const {frameId} = await getCDPNodeForElement(
+      page.getByRole('button', {name: 'Counter: 5'}).element()
+    );
+    const ax = await getFullAXTree(frameId);
     expect(axFind(ax, 'button')?.name?.value).toBe('Counter: 5');
 
     await userEvent.click(page.getByRole('button', {name: 'Counter: 5'}));
-    const axAfter = await getFullAXTree(await getTestFrameId());
+
+    const {frameId: frameIdAfter} = await getCDPNodeForElement(
+      page.getByRole('button', {name: 'Counter: 6'}).element()
+    );
+    const axAfter = await getFullAXTree(frameIdAfter);
     expect(axFind(axAfter, 'button')?.name?.value).toBe('Counter: 6');
   });
 });
