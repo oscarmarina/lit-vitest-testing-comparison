@@ -79,7 +79,7 @@ timer instead of synchronously, the test would fail again.
 
 ---
 
-### F2. `cdp()` attaches to the orchestrator page, not the test iframe
+### F2. `cdp()` attaches to the orchestrator page; reach the test iframe via its `frameId`
 
 **Symptom.** You call `Accessibility.getFullAXTree` or `queryAXTree` via `cdp()`
 and you do not see your DOM: only the `RootWebArea` of the "Vitest Browser
@@ -88,10 +88,28 @@ Runner" page and an AX `Iframe` node **without children** (`childIds: []`).
 
 **Root cause.** The CDP session of `cdp()` (from `vitest/browser`) attaches to
 the **orchestrator** page, which embeds the iframe where your test runs. The
-iframe's AX tree is a per-frame tree; document-level methods do not cross it.
+frames are **same-origin**, but each frame keeps its own AX tree. A
+document-level call **without `frameId` defaults to the root frame**, so the
+test iframe only shows up as an empty `Iframe` node.
 
-**Fix.** Audit the AX tree of the specific element with the "node under the
-cursor" trick:
+**Fix.** Resolve the test frame's `frameId` and pass it to `getFullAXTree`:
+
+```ts
+const {frameTree} = await client.send('Page.getFrameTree');
+// the test runs in <iframe name="vitest-iframe">
+const frameId = frameTree.childFrames[0].frame.id;
+
+const {nodes} = await client.send('Accessibility.getFullAXTree', {frameId});
+```
+
+This returns the **full AX tree of the test iframe** (`RootWebArea` "Vitest
+Browser Tester" + your components). `DOM.getNodeForLocation` also reports the
+`frameId` of the node it resolves, which is handy when you only have
+coordinates.
+
+For a **specific node**, `getPartialAXTree`/`queryAXTree` need a node anchor;
+`getNodeAtLocation` (the "node under the cursor" trick) provides it via
+`DOM.getNodeForLocation`, and `getPartialAXTree` returns the local AX subtree:
 
 ```ts
 const {backendNodeId} = await client.send('DOM.getNodeForLocation', {
@@ -106,11 +124,12 @@ const {nodes} = await client.send('Accessibility.getPartialAXTree', {
 
 This returns the element's **live AX node** (role, computed name, properties and
 current value) — the browser's real AX cache, independent of your DOM reads.
-Full helper in `test/counter-element-aria-cdp.test.ts` (`axNodeAtPoint`).
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:52` (helper),
-`test/counter-element-aria-cdp.test.ts:340` (`getFullAXTree` test),
-`test/counter-element-aria-cdp.test.ts:294` (progressbar audit).
+**Evidence.** `test/counter-element-aria-cdp.test.ts:84` (helper
+`getFullAXTree`), `test/counter-element-aria-cdp.test.ts:421`
+(`getFullAXTree({frameId})` test), `test/counter-element-aria-cdp.test.ts:103`
+(helper `getNodeAtLocation`), `test/counter-element-aria-cdp.test.ts:370`
+(progressbar audit).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
 
@@ -136,8 +155,8 @@ const axProperty = (node, name) =>
   node.properties?.find((p) => p.name === name)?.value?.value; // valuemin/max/focusable
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:76` (helper `axValue`),
-`:294` (audit with initial value 3 and value 4 after interaction).
+**Evidence.** `test/counter-element-aria-cdp.test.ts:136` (helper `axValue`),
+`:370` (audit with initial value 3 and value 4 after interaction).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
 
@@ -163,7 +182,7 @@ await expect
   .toHaveAttribute('aria-disabled', 'true');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:151` (`filters by disabled
+**Evidence.** `test/counter-element-aria-cdp.test.ts:211` (`filters by disabled
 state`). Note: the `src/FocusStepper.ts` component disables
 `lit-a11y/role-supports-aria-attr` because it deliberately uses `aria-disabled`
 on a `progressbar`.
@@ -200,7 +219,7 @@ const {node} = await client.send('DOM.describeNode', {nodeId});
 expect(node.localName).toBe('button');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:351` (`pierces nested
+**Evidence.** `test/counter-element-aria-cdp.test.ts:438` (`pierces nested
 shadow roots in the DOM domain snapshot`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -225,9 +244,9 @@ await userEvent.tab();
 expect(el.shadowRoot?.activeElement?.id).toBe('toggle');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:232` (Space/Enter activation
+**Evidence.** `test/counter-element-aria-cdp.test.ts:292` (Space/Enter activation
 and focus management),
-`test/counter-element-aria-cdp.test.ts:253` (arrows on the progressbar).
+`test/counter-element-aria-cdp.test.ts:313` (arrows on the progressbar).
 
 **Verified in.** `5.0.0-rc.1`.
 
@@ -246,7 +265,7 @@ test iframe.
 `vitest/browser`, which injects events inside the correct iframe. Reserve CDP
 `Input.*` for **pointer**, which does work (F8).
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:232`, `:253`
+**Evidence.** `test/counter-element-aria-cdp.test.ts:292`, `:313`
 (keyboard via `userEvent`).
 
 **Verified in.** `5.0.0-rc.1`.
@@ -269,7 +288,7 @@ await client.send('Input.dispatchMouseEvent', {type: 'mouseReleased', x, y, butt
 Useful when you need the "system" click (e.g. to verify the browser's AX tree
 reflects the new state, independent of the matcher).
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:380` (`drives a real
+**Evidence.** `test/counter-element-aria-cdp.test.ts:467` (`drives a real
 pointer click with raw Input.dispatchMouseEvent`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -297,7 +316,7 @@ expect(matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(true);
 await client.send('Emulation.setEmulatedMedia', {media: '', features: []});
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:412` (`emulates
+**Evidence.** `test/counter-element-aria-cdp.test.ts:499` (`emulates
 prefers-reduced-motion and forced-colors at the protocol level`).
 
 **Verified in.** `5.0.0-rc.1`, Chromium.
@@ -320,7 +339,7 @@ const tree = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
 expect(tree).toContain('- text: light-dom');
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:103` (`prunes aria-hidden
+**Evidence.** `test/counter-element-aria-cdp.test.ts:163` (`prunes aria-hidden
 nodes but keeps composed slotted light DOM`).
 
 **Verified in.** `5.0.0-rc.1`.
@@ -351,9 +370,9 @@ text:
 - status
 ```
 
-**Evidence.** `test/counter-element-aria-cdp.test.ts:84` (locators block),
-`test/counter-element-aria-cdp.test.ts:461` (`toMatchAriaInlineSnapshot`),
-`test/counter-element-aria-cdp.test.ts:470` (programmatic tree).
+**Evidence.** `test/counter-element-aria-cdp.test.ts:144` (locators block),
+`test/counter-element-aria-cdp.test.ts:548` (`toMatchAriaInlineSnapshot`),
+`test/counter-element-aria-cdp.test.ts:557` (programmatic tree).
 
 **Verified in.** `5.0.0-rc.1`.
 

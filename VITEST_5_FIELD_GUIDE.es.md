@@ -79,7 +79,7 @@ sincrónicamente, el test volvería a fallar.
 
 ---
 
-### F2. `cdp()` se adjunta a la página orquestadora, no al iframe del test
+### F2. `cdp()` se adjunta a la página orquestadora; llega al iframe del test vía su `frameId`
 
 **Síntoma.** Llamas a `Accessibility.getFullAXTree` o `queryAXTree` vía `cdp()`
 y no ves tu DOM: solo el `RootWebArea` de la página "Vitest Browser Runner" y
@@ -87,12 +87,29 @@ un nodo AX `Iframe` **sin hijos** (`childIds: []`). `DOMSnapshot.captureSnapshot
 tampoco expone un *aria snapshot*.
 
 **Causa raíz.** La sesión CDP de `cdp()` (de `vitest/browser`) se adjunta a la
-página **orquestadora**, que embebe el iframe donde corre tu test. El árbol AX
-del iframe es un árbol separado por frame; los métodos de nivel documento no lo
-atraviesan.
+página **orquestadora**, que embebe el iframe donde corre tu test. Los frames
+son **mismo-origen**, pero cada frame mantiene su propio árbol AX. Una llamada
+de nivel documento **sin `frameId` cae por defecto al frame raíz**, así que el
+iframe del test solo aparece como un nodo `Iframe` vacío.
 
-**Arreglo.** Audita el árbol AX del elemento en concreto con el truco de "nodo
-bajo el cursor":
+**Arreglo.** Resuelve el `frameId` del frame del test y pásalo a `getFullAXTree`:
+
+```ts
+const {frameTree} = await client.send('Page.getFrameTree');
+// el test corre en <iframe name="vitest-iframe">
+const frameId = frameTree.childFrames[0].frame.id;
+
+const {nodes} = await client.send('Accessibility.getFullAXTree', {frameId});
+```
+
+Esto devuelve el **árbol AX completo del iframe del test** (`RootWebArea`
+"Vitest Browser Tester" + tus componentes). `DOM.getNodeForLocation` también
+informa del `frameId` del nodo que resuelve, útil cuando solo tienes
+coordenadas.
+
+Para un **nodo concreto**, `getPartialAXTree`/`queryAXTree` necesitan un ancla;
+`getNodeAtLocation` (el truco de "nodo bajo el cursor") la proporciona vía
+`DOM.getNodeForLocation`, y `getPartialAXTree` devuelve el subtree AX local:
 
 ```ts
 const {backendNodeId} = await client.send('DOM.getNodeForLocation', {
@@ -107,12 +124,13 @@ const {nodes} = await client.send('Accessibility.getPartialAXTree', {
 
 Esto devuelve el **nodo AX vivo** del elemento (rol, nombre computado,
 propiedades y valor actual) — la caché AX real del navegador, independiente de
-tus lecturas del DOM. Helper completo en `test/counter-element-aria-cdp.test.ts`
-(`axNodeAtPoint`).
+tus lecturas del DOM.
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:52` (helper),
-`test/counter-element-aria-cdp.test.ts:340` (test `getFullAXTree`),
-`test/counter-element-aria-cdp.test.ts:294` (auditoría del progressbar).
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:84` (helper
+`getFullAXTree`), `test/counter-element-aria-cdp.test.ts:421`
+(test `getFullAXTree({frameId})`), `test/counter-element-aria-cdp.test.ts:103`
+(helper `getNodeAtLocation`), `test/counter-element-aria-cdp.test.ts:370`
+(auditoría del progressbar).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
 
@@ -138,8 +156,8 @@ const axProperty = (node, name) =>
   node.properties?.find((p) => p.name === name)?.value?.value; // valuemin/max/focusable
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:76` (helper `axValue`),
-`:294` (auditoría con valor inicial 3 y tras interacción 4).
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:136` (helper `axValue`),
+`:370` (auditoría con valor inicial 3 y tras interacción 4).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
 
@@ -164,7 +182,7 @@ await expect
   .toHaveAttribute('aria-disabled', 'true');
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:151` (`filters by
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:211` (`filters by
 disabled state`). Nota: el componente `src/FocusStepper.ts` desactiva
 `lit-a11y/role-supports-aria-attr` porque usa `aria-disabled` en un `progressbar`
 de forma deliberada.
@@ -201,7 +219,7 @@ const {node} = await client.send('DOM.describeNode', {nodeId});
 expect(node.localName).toBe('button');
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:351` (`pierces nested
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:438` (`pierces nested
 shadow roots in the DOM domain snapshot`).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
@@ -226,9 +244,9 @@ await userEvent.tab();
 expect(el.shadowRoot?.activeElement?.id).toBe('toggle');
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:232` (activación con
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:292` (activación con
 Space/Enter y gestión de foco),
-`test/counter-element-aria-cdp.test.ts:253` (flechas sobre el progressbar).
+`test/counter-element-aria-cdp.test.ts:313` (flechas sobre el progressbar).
 
 **Verificado en.** `5.0.0-rc.1`.
 
@@ -247,7 +265,7 @@ iframe del test.
 de `vitest/browser`, que inyecta los eventos dentro del iframe correcto.
 Reserva CDP `Input.*` para **puntero**, que sí funciona (F8).
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:232`, `:253`
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:292`, `:313`
 (teclado vía `userEvent`).
 
 **Verificado en.** `5.0.0-rc.1`.
@@ -271,7 +289,7 @@ await client.send('Input.dispatchMouseEvent', {type: 'mouseReleased', x, y, butt
 Útil cuando necesitas el clic "de sistema" (p. ej. para verificar que el árbol
 AX del navegador refleja el nuevo estado, independiente del matcher).
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:380` (`drives a real
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:467` (`drives a real
 pointer click with raw Input.dispatchMouseEvent`).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
@@ -299,7 +317,7 @@ expect(matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(true);
 await client.send('Emulation.setEmulatedMedia', {media: '', features: []});
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:412` (`emulates
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:499` (`emulates
 prefers-reduced-motion and forced-colors at the protocol level`).
 
 **Verificado en.** `5.0.0-rc.1`, Chromium.
@@ -323,7 +341,7 @@ const tree = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
 expect(tree).toContain('- text: light-dom');
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:103` (`prunes aria-hidden
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:163` (`prunes aria-hidden
 nodes but keeps composed slotted light DOM`).
 
 **Verificado en.** `5.0.0-rc.1`.
@@ -354,9 +372,9 @@ ARIA completo** del componente con un snapshot literal, incluyendo el texto con
 - status
 ```
 
-**Evidencia.** `test/counter-element-aria-cdp.test.ts:84` (bloque de locators),
-`test/counter-element-aria-cdp.test.ts:461` (`toMatchAriaInlineSnapshot`),
-`test/counter-element-aria-cdp.test.ts:470` (árbol programático).
+**Evidencia.** `test/counter-element-aria-cdp.test.ts:144` (bloque de locators),
+`test/counter-element-aria-cdp.test.ts:548` (`toMatchAriaInlineSnapshot`),
+`test/counter-element-aria-cdp.test.ts:557` (árbol programático).
 
 **Verificado en.** `5.0.0-rc.1`.
 

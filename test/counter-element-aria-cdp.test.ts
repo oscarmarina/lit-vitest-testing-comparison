@@ -43,25 +43,85 @@ interface AXNode {
   childIds?: string[];
 }
 
+interface FrameNode {
+  frame?: {id: string; name?: string};
+  childFrames?: FrameNode[];
+}
+
 /**
- * The vitest `cdp()` session is attached to the orchestrator page, so the
- * tester iframe is a separate AX tree. We still audit the *real* browser AX
- * tree by resolving the element under the cursor (`DOM.getNodeForLocation`)
- * and pulling its live AX node with `Accessibility.getPartialAXTree`.
+ * The `cdp()` session is attached to the orchestrator page; the test runs in a
+ * same-origin `<iframe name="vitest-iframe">`. Document-level AX calls without
+ * a `frameId` default to the root frame (the runner + an `Iframe` node with no
+ * children), so full-tree queries must target the test frame's `frameId` (F2).
  */
-async function axNodeAtPoint(selector: () => Element): Promise<{
+async function getTestFrameId(): Promise<string> {
+  await client.send('Page.enable');
+  const {frameTree} = await client.send('Page.getFrameTree');
+  const findTestFrame = (node: FrameNode): string | undefined => {
+    if (node.frame?.name === 'vitest-iframe') {
+      return node.frame.id;
+    }
+    for (const child of node.childFrames ?? []) {
+      const id = findTestFrame(child);
+      if (id) {
+        return id;
+      }
+    }
+    return undefined;
+  };
+  const frameId = findTestFrame(frameTree);
+  if (!frameId) {
+    throw new Error('test iframe not found in Page.getFrameTree');
+  }
+  return frameId;
+}
+
+/**
+ * The full AX tree of a frame. Without a `frameId` it defaults to the root
+ * frame (the runner + an `Iframe` node with no children); pass the test
+ * frame's `frameId` to get the iframe's own tree (see F2).
+ */
+async function getFullAXTree(frameId?: string): Promise<AXNode[]> {
+  await client.send('Accessibility.enable');
+  const {nodes} = await client.send('Accessibility.getFullAXTree', {
+    ...(frameId ? {frameId} : {}),
+  });
+  return nodes as AXNode[];
+}
+
+interface CDPNodeLocation {
   backendNodeId: number;
-  ax: AXNode[];
-}> {
-  const rect = selector().getBoundingClientRect();
+  nodeId: number;
+  frameId: string;
+}
+
+/**
+ * Correlate a test-DOM element with its CDP node and frame: resolve the node
+ * under the cursor at the element's center. The response reports the `frameId`
+ * of the frame that owns the node, plus its `backendNodeId`/`nodeId`.
+ */
+async function getNodeAtLocation(element: Element): Promise<CDPNodeLocation> {
+  const rect = element.getBoundingClientRect();
   const x = Math.round(rect.x + rect.width / 2);
   const y = Math.round(rect.y + rect.height / 2);
-  const {backendNodeId} = await client.send('DOM.getNodeForLocation', {x, y});
+  const result = await client.send('DOM.getNodeForLocation', {x, y});
+  return {
+    backendNodeId: result.backendNodeId as number,
+    nodeId: result.nodeId as number,
+    frameId: result.frameId as string,
+  };
+}
+
+/**
+ * The local AX subtree around a backend node. `getPartialAXTree`/`queryAXTree`
+ * need a node anchor; `getNodeAtLocation` supplies it.
+ */
+async function getPartialAXTree(backendNodeId: number): Promise<AXNode[]> {
   const {nodes} = await client.send('Accessibility.getPartialAXTree', {
     backendNodeId,
     fetchRelatives: true,
   });
-  return {backendNodeId, ax: nodes as AXNode[]};
+  return nodes as AXNode[];
 }
 
 function axFind(ax: AXNode[], role: string): AXNode | undefined {
@@ -312,10 +372,16 @@ describe('CDP deep dive (Chromium only)', () => {
     await userEvent.click(page.getByRole('button', {name: 'Show session panel'}));
     await el.updateComplete;
 
-    const {backendNodeId, ax} = await axNodeAtPoint(() =>
+    // Resolve the progressbar's CDP node + frame, then audit it through the
+    // test frame's full AX tree: the `frameId` reported by
+    // `DOM.getNodeForLocation` is the one `getFullAXTree` targets.
+    const {frameId} = await getNodeAtLocation(
       page.getByRole('progressbar', {name: 'Session progress'}).element()
     );
-    const meter = axFind(ax, 'progressbar');
+    expect(frameId).toBeTruthy();
+    const getMeter = async () => axFind(await getFullAXTree(frameId), 'progressbar');
+
+    const meter = await getMeter();
     expect(meter).toBeDefined();
     expect(meter?.name?.value).toBe('Session progress');
     // valuenow is the top-level AX `value`; valuemin/valuemax/focusable live in
@@ -328,40 +394,45 @@ describe('CDP deep dive (Chromium only)', () => {
     await el.updateComplete;
 
     // The browser's AX cache is authoritative and independent of our DOM reads.
-    const {ax: axAfter} = await axNodeAtPoint(() =>
-      page.getByRole('progressbar', {name: 'Session progress'}).element()
-    );
-    expect(axValue(axFind(axAfter, 'progressbar')!)).toBe(4);
-    expect(backendNodeId).toBeGreaterThan(0);
+    expect(axValue((await getMeter())!)).toBe(4);
   });
 
   it('audits the live accessible name of the material button', async () => {
     await mountCounter();
 
-    const {ax} = await axNodeAtPoint(() =>
+    // Local-subtree technique: anchor on the button's backend node and pull
+    // the AX context around it with getPartialAXTree (which needs an anchor).
+    const {backendNodeId} = await getNodeAtLocation(
       page.getByRole('button', {name: 'Counter: 5'}).element()
     );
-    const buttonAx = axFind(ax, 'button');
+    const buttonAx = axFind(await getPartialAXTree(backendNodeId), 'button');
     expect(buttonAx?.name?.value).toBe('Counter: 5');
     expect(axProperty(buttonAx!, 'focusable')).toBe(true);
 
     await userEvent.click(page.getByRole('button', {name: 'Counter: 5'}));
 
-    const {ax: axAfter} = await axNodeAtPoint(() =>
+    const {backendNodeId: backendNodeIdAfter} = await getNodeAtLocation(
       page.getByRole('button', {name: 'Counter: 6'}).element()
     );
+    const axAfter = await getPartialAXTree(backendNodeIdAfter);
     expect(axFind(axAfter, 'button')?.name?.value).toBe('Counter: 6');
   });
 
-  it('audits the document-level AX tree with Accessibility.getFullAXTree', async () => {
+  it('reaches the test AX tree via Accessibility.getFullAXTree({frameId})', async () => {
     await mountCounter();
-    await client.send('Accessibility.enable');
-    const {nodes} = await client.send('Accessibility.getFullAXTree');
 
-    const webArea = nodes.find((node: AXNode) => node.role?.value === 'RootWebArea');
-    expect(webArea).toBeDefined();
-    // The tester iframe is embedded in the orchestrator page as an AX Iframe node.
-    expect(nodes.some((node: AXNode) => node.role?.value === 'Iframe')).toBe(true);
+    // Without a frameId the helper defaults to the root frame: the runner's
+    // RootWebArea plus an Iframe node without children (F2 symptom) - the
+    // test's own content is missing from this tree.
+    const rootNodes = await getFullAXTree();
+    expect(rootNodes.find((node: AXNode) => node.role?.value === 'RootWebArea')).toBeDefined();
+    expect(rootNodes.some((node: AXNode) => node.role?.value === 'Iframe')).toBe(true);
+    expect(rootNodes.some((node: AXNode) => node.name?.value === 'Counter: 5')).toBe(false);
+
+    // Targeting the test frame's frameId returns the iframe's own AX tree.
+    const ax = await getFullAXTree(await getTestFrameId());
+    expect(ax.some((node: AXNode) => node.role?.value === 'RootWebArea')).toBe(true);
+    expect(axFind(ax, 'button')?.name?.value).toBe('Counter: 5');
   });
 
   it('pierces nested shadow roots in the DOM domain snapshot', async () => {
@@ -507,15 +578,11 @@ describe('Accessibility tree snapshots & matching', () => {
       .element(page.getByRole('button', {name: 'Counter: 5'}))
       .toHaveAccessibleName('Counter: 5');
 
-    const {ax} = await axNodeAtPoint(() =>
-      page.getByRole('button', {name: 'Counter: 5'}).element()
-    );
+    const ax = await getFullAXTree(await getTestFrameId());
     expect(axFind(ax, 'button')?.name?.value).toBe('Counter: 5');
 
     await userEvent.click(page.getByRole('button', {name: 'Counter: 5'}));
-    const {ax: axAfter} = await axNodeAtPoint(() =>
-      page.getByRole('button', {name: 'Counter: 6'}).element()
-    );
+    const axAfter = await getFullAXTree(await getTestFrameId());
     expect(axFind(axAfter, 'button')?.name?.value).toBe('Counter: 6');
   });
 });

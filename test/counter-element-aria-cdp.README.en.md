@@ -76,7 +76,8 @@ There is also a section of reusable **helpers**:
 - `mountCounter` / `mountStepper`: mount each component via `fixture` from
   `@open-wc/testing-helpers`, which awaits the element's `updateComplete`.
   `afterEach(fixtureCleanup)` removes the mounted fixtures after each test.
-- `axNodeAtPoint`: the key CDP piece (explained in section 6).
+- `getNodeAtLocation` / `getFullAXTree`: the key CDP pieces (explained in
+  section 6).
 - `axFind`, `axProperty`, `axValue`: utilities to navigate the AX tree nodes
   returned by CDP.
 
@@ -259,55 +260,82 @@ protocol level to audit the accessibility tree "first hand".
 ### The underlying problem (key finding)
 
 We discovered that **the `cdp()` session attaches to the "orchestrator" page**,
-not to the iframe where the test runs. That is why:
+not to the iframe where the test runs. The frames are **same-origin**, but each
+frame keeps its own AX tree. That is why:
 
-- `Accessibility.getFullAXTree` returns **only the orchestrator page's tree**,
-  where the test iframe appears as a single `Iframe` node **without children**
-  (`childIds: []`).
-- `Accessibility.queryAXTree` returns empty for other frames' subtrees.
+- `Accessibility.getFullAXTree` **without `frameId`** returns **only the root
+  frame's tree**: the runner's `RootWebArea` plus the test iframe as a single
+  `Iframe` node **without children** (`childIds: []`).
+- `Accessibility.queryAXTree` searches the root frame's subtree only.
 - `DOMSnapshot.captureSnapshot` does not expose any *aria snapshot* field.
 
-In other words: **we cannot ask CDP for the iframe's AX tree directly.**
+In other words: **document-level AX calls default to the root frame**; the test
+iframe must be targeted explicitly via its `frameId`.
 
-### The solution: `axNodeAtPoint` (CDP's "eye")
+### The fix: target the test frame's `frameId`
+
+`Accessibility.getFullAXTree` accepts a `frameId`. Resolve the test iframe with
+`Page.getFrameTree` and pass it:
 
 ```ts
-async function axNodeAtPoint(selector) {
-  const rect = selector().getBoundingClientRect();
+const {frameTree} = await client.send('Page.getFrameTree');
+// the test runs in <iframe name="vitest-iframe">
+const frameId = frameTree.childFrames[0].frame.id;
+const {nodes} = await client.send('Accessibility.getFullAXTree', {frameId});
+```
+
+This returns the **full AX tree of the test iframe** (`RootWebArea` "Vitest
+Browser Tester" + your components). The `getFullAXTree(frameId?)` helper in the
+test wraps this lookup: call it **without** a `frameId` to get the root frame's
+tree, **with** the test frame's `frameId` to get the iframe's. `DOM.getNodeForLocation`
+also reports the `frameId` of the node it resolves, which is handy when you
+only have coordinates.
+
+### Targeting a specific node: `getNodeAtLocation` + `getPartialAXTree` (CDP's "eye")
+
+For a **specific element's live AX node**, `getPartialAXTree`/`queryAXTree`
+need a node anchor. We anchor on the element itself by asking Chromium which
+node is **under the cursor** at its center — element resolution and AX pull are
+two separate helpers:
+
+```ts
+async function getNodeAtLocation(element) {
+  const rect = element.getBoundingClientRect();
   const x = Math.round(rect.x + rect.width / 2);
   const y = Math.round(rect.y + rect.height / 2);
-  const {backendNodeId} = await client.send('DOM.getNodeForLocation', {x, y});
+  return client.send('DOM.getNodeForLocation', {x, y});
+}
+
+async function getPartialAXTree(backendNodeId) {
   const {nodes} = await client.send('Accessibility.getPartialAXTree', {
     backendNodeId,
     fetchRelatives: true,
   });
-  return {backendNodeId, ax: nodes};
+  return nodes;
 }
 ```
 
-Trick: we ask Chromium which element is **under the cursor** at the coordinates
-of the center of the element we care about (`DOM.getNodeForLocation` →
-`backendNodeId`) and then request the **live AX node** of that element with
-`Accessibility.getPartialAXTree`. This returns the role, the computed accessible
-name, the properties (`focusable`, `valuemin`, …) and, for widgets, the
-**current value**. It is the real accessibility tree, independent of the DOM we
-read from the test.
+This returns the role, the computed accessible name, the properties
+(`focusable`, `valuemin`, …) and, for widgets, the **current value**. It is the
+real accessibility tree, independent of the DOM we read from the test.
 
 ### The block's tests
 
 **`audits the live progressbar AX node and its valuenow over time`**
 
-- Locates the `progressbar` via `axNodeAtPoint`, finds its AX node with
-  `axFind(ax, 'progressbar')` and verifies name, value, `valuemax` and
+- Resolves the `progressbar` with `getNodeAtLocation`, takes its `frameId` and
+  audits it through the test frame's full AX tree (`getFullAXTree(frameId)` →
+  `axFind(ax, 'progressbar')`), verifying name, value, `valuemax` and
   `focusable`.
 - **AX schema finding**: a `progressbar`'s current value is NOT in
   `properties.valuenow` (it does not even exist): it lives in the node's
   top-level **`value`** field. `valuemin`, `valuemax` and `focusable` do live in
   `properties`. That is why the `axValue()` helper reads `node.value?.value`.
-- After pressing "Complete session" we **re-query the AX node** and confirm the
+- After pressing "Complete session" we **re-query the AX tree** and confirm the
   browser updated its AX cache to `4`, independently of our DOM read. It proves
   **the browser's AX cache is the authoritative source**.
-- `backendNodeId` is greater than 0: the protocol resolved a real DOM node.
+- `frameId` is truthy: `DOM.getNodeForLocation` reports the frame that owns the
+  node.
 
 **`audits the live accessible name of the material button`**
 
@@ -317,12 +345,14 @@ read from the test.
 - After a real click, the new AX node returns "Counter: 6". The accessible name
   Chromium computes **matches Vitest's locator**.
 
-**`audits the document-level AX tree with Accessibility.getFullAXTree`**
+**`reaches the test AX tree via Accessibility.getFullAXTree({frameId})`**
 
-- Verifies the orchestrator page has a `RootWebArea` node and that the test
-  iframe appears as an `Iframe` AX node. It documents section 6.1's limitation:
-  **the iframe's full tree is not reachable via CDP**; you must go node by node
-  with `getPartialAXTree`.
+- Confirms the F2 finding: `getFullAXTree` **without `frameId`** returns the root
+  frame's tree — the runner's `RootWebArea` plus an `Iframe` node, **without the
+  test's content** ("Counter: 5" is absent).
+- Then passes the test frame's `frameId` (via `getFullAXTree(await getTestFrameId())`)
+  and gets the iframe's own AX tree, which **does** contain our content: the
+  material button's computed name is "Counter: 5".
 
 **`pierces nested shadow roots in the DOM domain snapshot`**
 
@@ -400,9 +430,10 @@ version of the snapshot.
 ### `keeps matcher-computed and CDP-computed accessible names in sync`
 
 Closes the loop: the accessible name **Vitest's matcher** computes ("Counter: 5")
-must match the one **CDP computes directly**
-(`axFind(ax, 'button')?.name?.value`), before and after the click. If the two
-sources diverged, we would have a reliability problem in the locator layer.
+must match the one **CDP computes directly** from the test iframe's full AX tree
+(`getFullAXTree(await getTestFrameId())` → `axFind(ax, 'button')?.name?.value`), before and after the
+click. If the two sources diverged, we would have a reliability problem in the
+locator layer.
 
 ---
 
@@ -410,9 +441,10 @@ sources diverged, we would have a reliability problem in the locator layer.
 
 | Finding | Where it is documented |
 | -------- | ------------------ |
-| `cdp()` attaches to the orchestrator page; the test iframe is a separate AX tree. | Section 6.1, `getFullAXTree` test |
-| `Accessibility.getFullAXTree` / `queryAXTree` cannot reach the iframe content. | Section 6.1 |
-| `DOM.getNodeForLocation` + `Accessibility.getPartialAXTree` give the "live" AX node of any element. | `axNodeAtPoint` helper |
+| `cdp()` attaches to the orchestrator page; the test iframe has its own AX tree, reachable via its `frameId`. | Section 6, `getFullAXTree({frameId})` test |
+| `Accessibility.getFullAXTree` / `queryAXTree` without `frameId` only reach the root frame; pass the test frame's `frameId` to see the iframe content. | Section 6 |
+| `Page.getFrameTree` + `Accessibility.getFullAXTree({frameId})` return the test iframe's full AX tree. | `getFullAXTree` helper |
+| `DOM.getNodeForLocation` + `Accessibility.getPartialAXTree` give the "live" AX node of any element (node anchor for `getPartialAXTree`). | `getNodeAtLocation`/`getPartialAXTree` helpers |
 | A `progressbar`'s value is in `node.value`, not in `properties.valuenow`. | `valuenow over time` test |
 | The `disabled` filter of `getByRole` ignores `aria-disabled` on non-button widgets. | `filters by disabled state` test |
 | `DOM.querySelector` pierces Shadow DOM only when rooted at the Shadow Root's `nodeId`. | `DOM domain snapshot` test |
@@ -450,8 +482,8 @@ Ideas that could grow from this work:
 1. **Accessibility regression matrix**: query the AX node after every interaction
    and compare `role + name + focusable + disabled` against a golden JSON per
    state.
-2. **Custom matcher** `toHaveLiveAXNode`: wrap `axNodeAtPoint` in an `expect`
-   extension so the team can write
+2. **Custom matcher** `toHaveLiveAXNode`: wrap `getNodeAtLocation` +
+   `getPartialAXTree` in an `expect` extension so the team can write
    `expect(el).toHaveLiveAXNode({role: 'progressbar', value: 4})`.
 3. **`prefers-reduced-motion` harness**: a helper that enables/restores media
    emulation to verify components drop animations and contrast in
@@ -459,5 +491,7 @@ Ideas that could grow from this work:
 4. **Pointer fuzzer**: use `DOM.getNodeForLocation` on random points to detect
    "dead zones" where an overlaid *touch target* swallows clicks meant for a
    real control.
-5. **AX bridge between frames**: a generic helper (`axNodeAtPoint`-style) that
-   serves as a CDP abstraction layer for the rest of the team.
+5. **AX bridge between frames**: a generic helper that resolves the test
+   frame's `frameId` (`getFullAXTree`) plus a targeted
+   `getNodeAtLocation`/`getPartialAXTree` that serve as the CDP abstraction
+   layer for the rest of the team.
