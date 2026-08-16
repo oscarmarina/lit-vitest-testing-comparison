@@ -44,6 +44,16 @@
         border-radius: 10px;
       }
 
+      figure {
+        margin: 0;
+      }
+
+      figcaption {
+        padding: 0.75rem 1rem 0;
+        font-size: 0.85rem;
+        color: #5b5561;
+      }
+
       .log {
         max-width: 72rem;
         margin: 0 2rem 2rem;
@@ -65,7 +75,7 @@
   </head>
   <body>
     <header>
-      <h1>&lt;focus-stepper&gt;</h1>
+      <h1>focus-stepper</h1>
       <p>
         A self-contained Lit component exercising an ARIA state matrix: an
         <code>aria-expanded</code>
@@ -86,14 +96,23 @@
     </header>
 
     <main>
-      <focus-stepper></focus-stepper>
+      <figure>
+        <figcaption>Default: value=3, max=10, step=1</figcaption>
+        <focus-stepper></focus-stepper>
+      </figure>
 
-      <focus-stepper disabled value="4"></focus-stepper>
+      <figure>
+        <figcaption>Disabled: buttons off, meter aria-disabled</figcaption>
+        <focus-stepper disabled value="4"></focus-stepper>
+      </figure>
 
-      <focus-stepper expanded max="5" step="2"></focus-stepper>
+      <figure>
+        <figcaption>Expanded: open by default, max=5, step=2</figcaption>
+        <focus-stepper expanded max="5" step="2"></focus-stepper>
+      </figure>
     </main>
 
-    <div class="log" id="log">&gt; events will appear here</div>
+    <div class="log" id="log">events will appear here</div>
 
     <script type="module">
       import './entry.js';
@@ -102,7 +121,7 @@
 
       function logEvent(prefix, detail) {
         const entry = document.createElement('div');
-        entry.textContent = `&gt; ${prefix} -> ${detail}`;
+        entry.textContent = `${prefix} -> ${detail}`;
         log.append(entry);
       }
 

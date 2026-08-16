@@ -276,6 +276,22 @@ describe('Real user interactions (userEvent)', () => {
     await expect.element(meter).toHaveAttribute('aria-valuenow', '3');
   });
 
+  it('increments the complete button by step', async () => {
+    const el = await fixture<FocusStepper>(html`
+      <focus-stepper step="2" max="5" expanded></focus-stepper>
+    `);
+    await el.updateComplete;
+
+    await userEvent.click(page.getByRole('button', {name: 'Complete session'}));
+    await el.updateComplete;
+    expect(el.value).toBe(5);
+
+    // The value stays clamped at max regardless of the step.
+    await userEvent.click(page.getByRole('button', {name: 'Complete session'}));
+    await el.updateComplete;
+    expect(el.value).toBe(5);
+  });
+
   it('applies and releases real pointer hover state', async () => {
     await mountCounter();
     const button = page.getByRole('button', {name: 'Counter: 5'});

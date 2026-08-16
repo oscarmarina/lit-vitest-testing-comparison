@@ -54,12 +54,20 @@ export class FocusStepper extends LitElement {
       height: 1rem;
       margin: 0.75rem 0;
       border-radius: 999px;
-      background: #e0e0e0;
+      background: linear-gradient(
+        to right,
+        #3b82f6 0 var(--meter-pct),
+        #e0e0e0 var(--meter-pct) 100%
+      );
       box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
     }
 
     #meter[aria-disabled='true'] {
-      background: #d8d8d8;
+      background: linear-gradient(
+        to right,
+        #9db9e8 0 var(--meter-pct),
+        #d8d8d8 var(--meter-pct) 100%
+      );
     }
   `;
 
@@ -76,7 +84,7 @@ export class FocusStepper extends LitElement {
   max = 10;
 
   /**
-   * The increment applied by the arrow keys.
+   * The increment applied by the arrow keys and the complete button.
    */
   @property({type: Number})
   step = 1;
@@ -116,6 +124,7 @@ export class FocusStepper extends LitElement {
           aria-valuetext="${this.value} of ${this.max} sessions completed"
           aria-disabled=${this.disabled}
           tabindex=${this.disabled ? '-1' : '0'}
+          style="--meter-pct: ${(this.value / this.max) * 100}%"
           @keydown=${this.#onMeterKeydown}></div>
         <button id="complete" type="button" ?disabled=${this.disabled} @click=${this.#onComplete}>
           Complete session
@@ -151,7 +160,7 @@ export class FocusStepper extends LitElement {
     if (this.disabled) {
       return;
     }
-    this.value = Math.min(this.value + 1, this.max);
+    this.value = Math.min(this.value + this.step, this.max);
     this.dispatchEvent(
       new CustomEvent('session-complete', {detail: this.value, bubbles: true, composed: true})
     );
