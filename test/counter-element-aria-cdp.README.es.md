@@ -63,7 +63,7 @@ anidado a dos niveles**: `counter-element` → `md-filled-button` → `<button>`
 
 ## 2. Estructura del archivo
 
-El archivo tiene **24 tests** organizados en **5 bloques `describe`**:
+El archivo tiene **26 tests** organizados en **5 bloques `describe`**:
 
 | Bloque | Tema |
 | ------ | ---- |
@@ -78,8 +78,9 @@ Además hay una sección de **helpers** reutilizables:
 - `mountCounter` / `mountStepper`: montan cada componente mediante `fixture` de
   `@open-wc/testing-helpers`, que espera el `updateComplete` del elemento.
   `afterEach(fixtureCleanup)` elimina los fixtures montados tras cada test.
-- `getCDPNodeForElement` / `getFullAXTree`: las piezas clave de CDP (se explican
-  en la sección 6).
+- `getCDPNodeForElement` / `getAXNodeForElement` / `getFullAXTree` /
+  `getPartialAXTree` / `getCDPClickPointForElement`: las piezas clave de CDP (se
+  explican en la sección 6).
 - `axFind`, `axProperty`, `axValue`: utilidades para navegar los nodos del
   árbol AX devuelto por CDP.
 
@@ -296,19 +297,22 @@ del frame raíz, **con** el `frameId` del frame del test para obtener el del
 iframe. `DOM.getNodeForLocation` también informa del `frameId` del nodo que
 resuelve, útil cuando solo tienes coordenadas.
 
-### Apuntando a un nodo concreto: `getCDPNodeForElement` + `getPartialAXTree` (el "ojo" de CDP)
+### Identidad de nodo vs. coordenadas: `getCDPNodeForElement` + `getPartialAXTree` (el "ojo" de CDP)
 
-Para el **nodo AX vivo de un elemento concreto**, `getPartialAXTree`/
-`queryAXTree` necesitan un ancla. Nos anclamos al propio elemento pidiendo a
-Chromium qué nodo está **bajo el cursor** en su centro — la resolución del
-elemento y la extracción AX son dos helpers separados:
+Una trampa recurrente: `DOM.getNodeForLocation()` es un **hit-test**, no un
+resolutor de elementos. Con Shadow DOM anidado y overlays de componentes, el nodo
+bajo el puntero puede ser un *touch target* u otro elemento por encima del que el
+test seleccionó. Así que para el **nodo AX vivo de un elemento concreto** NO nos
+anclamos en coordenadas: resolvemos el elemento DOM exacto a su `backendNodeId`
+CDP y lo usamos como ancla de `getPartialAXTree`. La resolución del elemento y la
+extracción AX son dos helpers separados:
 
 ```ts
 async function getCDPNodeForElement(element) {
-  const rect = element.getBoundingClientRect();
-  const x = Math.round(rect.x + rect.width / 2);
-  const y = Math.round(rect.y + rect.height / 2);
-  return client.send('DOM.getNodeForLocation', {x, y});
+  // 1. marca única temporal sobre el elemento exacto
+  // 2. Page.getFrameTree -> un isolated world por frame
+  // 3. Runtime.evaluate: querySelector recursivo que perfora shadow roots abiertos
+  // 4. DOM.describeNode({objectId}) -> {backendNodeId, frameId}
 }
 
 async function getPartialAXTree(backendNodeId) {
@@ -317,6 +321,11 @@ async function getPartialAXTree(backendNodeId) {
     fetchRelatives: true,
   });
   return nodes;
+}
+
+async function getAXNodeForElement(element, role, name) {
+  const {backendNodeId} = await getCDPNodeForElement(element);
+  return axFind(await getPartialAXTree(backendNodeId), role, name);
 }
 ```
 
@@ -334,6 +343,8 @@ flowchart TB
         C2["getCDPNodeForElement(element)"]
         C3["getFullAXTree(frameId?)"]
         C4["getPartialAXTree(backendNodeId)"]
+        C5["getAXNodeForElement(element, role, name)"]
+        C6["getCDPClickPointForElement(element)"]
     end
 
     subgraph frames["Frame topology (Page.getFrameTree)"]
@@ -356,16 +367,27 @@ flowchart TB
     C3 -- "no frameId (default)" --> T1
     C3 -- "frameId" --> T2
 
-    C2 -- "frameId" --> C3
-    C2 -- "backendNodeId" --> C4
+    C2 -- "exact backendNodeId" --> C4
+    C5 -- "uses" --> C2
+    C5 -- "backendNodeId" --> C4
     C4 --> T3
+
+    C6 -- "exact backendNodeId + DOM.getContentQuads" --> C2
+    C6 -- "click point (verified in frame)" --> I1["Input.dispatchMouseEvent"]
 ```
 
 - `getTestFrameId()` queda confinado a los tests de topología/infraestructura
   (arista punteada); los tests funcionales resuelven el `frameId` desde el
   propio elemento objetivo.
-- `getCDPNodeForElement` es el punto de entrada funcional: `frameId` → árbol AX
-  completo, `backendNodeId` → subtree AX local.
+- `getCDPNodeForElement` es el punto de entrada funcional: devuelve el
+  `backendNodeId` exacto del elemento (+ el `frameId` que lo posee), de forma
+  independiente de la geometría o del nombre `vitest-iframe`.
+- `getAXNodeForElement` compone resolución + extracción AX: elemento exacto →
+  nodo AX vivo por rol y nombre accesible.
+- `getCDPClickPointForElement` convierte el nodo exacto en coordenadas de clic
+  de protocolo vía `DOM.getContentQuads()`, y verifica que el punto cae en el
+  frame objetivo (el hit-test solo como *cross-check* de frame, no como
+  resolución de elemento).
 - `getFullAXTree(frameId?)` hace explícita la distinción default-raíz vs.
   frame explícito.
 
@@ -373,10 +395,9 @@ flowchart TB
 
 **`audits the live progressbar AX node and its valuenow over time`**
 
-- Resuelve el `progressbar` con `getCDPNodeForElement`, toma su `frameId` y lo
-  audita a través del árbol AX completo del frame del test
-  (`getFullAXTree(frameId)` → `axFind(ax, 'progressbar')`), verificando nombre,
-  valor, `valuemax` y `focusable`.
+- Resuelve el `progressbar` exacto con `getAXNodeForElement` y audita su nodo AX
+  vivo (`getCDPNodeForElement` → `getPartialAXTree` → `axFind`), verificando
+  nombre, valor, `valuemax` y `focusable`.
 - **Hallazgo del esquema AX**: el valor actual de un `progressbar` NO está en
   `properties.valuenow` (que ni existe): vive en el campo **`value` de nivel
   superior** del nodo AX. En cambio `valuemin`, `valuemax` y `focusable` sí
@@ -385,14 +406,12 @@ flowchart TB
   que el navegador ha actualizado su caché AX a `4`, de forma independiente de
   nuestra lectura del DOM. Es la prueba de que **la caché AX del navegador es
   la fuente autoritativa**.
-- `frameId` es truthy: `DOM.getNodeForLocation` informa del frame que posee el
-  nodo.
 
 **`audits the live accessible name of the material button`**
 
-- Replica el patrón sobre `counter-element`: obtiene el nodo AX del botón de
-  material (dos Shadow DOMs adentro) y verifica que su **nombre accesible
-  computado** es "Counter: 5".
+- Replica el patrón sobre `counter-element`: resuelve el botón de material exacto
+  (dos Shadow DOMs adentro) con `getAXNodeForElement` y verifica que su
+  **nombre accesible computado** es "Counter: 5".
 - Tras un clic real, el nuevo nodo AX devuelve "Counter: 6". El nombre
   accesible que computa Chromium **coincide con el locator** de Vitest.
 
@@ -439,11 +458,17 @@ flowchart TB
 
 **`drives a real pointer click with raw Input.dispatchMouseEvent`**
 
+- Las coordenadas del clic vienen de la **geometría CDP**, no de
+  `getBoundingClientRect()`: `getCDPClickPointForElement` resuelve el botón
+  exacto (`getCDPNodeForElement`) y lee su quad con `DOM.getContentQuads()`,
+  después verifica que el punto cae en el frame objetivo.
 - Disparamos `mouseMoved`, `mousePressed` y `mouseReleased` con
   `Input.dispatchMouseEvent` (la secuencia exacta que genera un clic real a
   nivel de sistema).
-- El contador pasa a 6 y el árbol AX lo refleja. **A nivel de protocolo, sin
-  tocar el DOM**, podemos hacer click.
+- El test verifica la secuencia completa de eventos del navegador
+  (`pointerdown` → `mousedown` → `pointerup` → `mouseup` → `click`) y que el
+  contador pasó a 6. **A nivel de protocolo, sin tocar el DOM**, podemos hacer
+  click.
 
 **`emulates prefers-reduced-motion and forced-colors at the protocol level`**
 
@@ -492,11 +517,11 @@ matchers) del snapshot.
 ### `keeps matcher-computed and CDP-computed accessible names in sync`
 
 Cierra el círculo: el nombre accesible que computa el **matcher de Vitest**
-("Counter: 5") debe coincidir con el que computa **CDP directamente** a partir
-del árbol AX completo del iframe del test (`getCDPNodeForElement` →
-`getFullAXTree(frameId)` → `axFind(ax, 'button')?.name?.value`), antes y
-después del clic. Si las dos fuentes divergieran, tendríamos un problema de
-fiabilidad en la capa de locators.
+("Counter: 5") debe coincidir con el que computa **CDP directamente** para el
+nodo AX vivo del elemento exacto (`getAXNodeForElement` → `getCDPNodeForElement`
++ `getPartialAXTree` → `axFind(..., 'button')?.name?.value`), antes y después
+del clic. Si las dos fuentes divergieran, tendríamos un problema de fiabilidad
+en la capa de locators.
 
 ---
 
@@ -507,14 +532,15 @@ fiabilidad en la capa de locators.
 | `cdp()` se adjunta a la página orquestadora; el iframe del test tiene su propio árbol AX, accesible vía su `frameId`. | Sección 6, test `getFullAXTree({frameId})` |
 | `Accessibility.getFullAXTree` / `queryAXTree` sin `frameId` solo alcanzan el frame raíz; pasa el `frameId` del frame del test para ver el contenido del iframe. | Sección 6 |
 | `Page.getFrameTree` + `Accessibility.getFullAXTree({frameId})` devuelven el árbol AX completo del iframe del test. | Helper `getFullAXTree` |
-| `DOM.getNodeForLocation` + `Accessibility.getPartialAXTree` dan el nodo AX "vivo" de cualquier elemento (ancla para `getPartialAXTree`). | Helpers `getCDPNodeForElement`/`getPartialAXTree` |
+| `DOM.getNodeForLocation` es un **hit-test**, no un resolutor de elementos; resuelve el elemento exacto a su `backendNodeId`. | Helper `getCDPNodeForElement` |
+| `backendNodeId` exacto + `Accessibility.getPartialAXTree` dan el nodo AX "vivo" de cualquier elemento. | Helpers `getAXNodeForElement`/`getPartialAXTree` |
 | El valor de un `progressbar` está en `node.value`, no en `properties.valuenow`. | Test `valuenow over time` |
 | El filtro `disabled` de `getByRole` ignora `aria-disabled` en widgets no-botón. | Test `filters by disabled state` |
 | `DOM.querySelector` perfora Shadow DOM solo cuando la raíz es el `nodeId` del Shadow Root. | Test `DOM domain snapshot` |
 | `DOM.getNodeForLocation` puede resolver el *touch target* de Material en lugar del `<button>`. | Test `DOM domain snapshot` |
 | `toHaveFocus` es poco fiable para elementos internos del Shadow DOM; usar `shadowRoot.activeElement`. | Test de Space/Enter |
 | `Emulation.setEmulatedMedia` afecta a `matchMedia` en tiempo real. | Test de `prefers-reduced-motion` |
-| `Input.dispatchMouseEvent` genera clicks reales a nivel de protocolo. | Test `dispatchMouseEvent` |
+| `Input.dispatchMouseEvent` hace clic en elementos reales cuando las coordenadas vienen de `DOM.getContentQuads()` (geometría CDP). | `getCDPClickPointForElement` + test `dispatchMouseEvent` |
 | Los locators ARIA perforan Shadow DOM anidado sin configuración extra. | Bloque 1 |
 
 ---
@@ -530,6 +556,9 @@ npx vitest run
 
 # Modo watch durante desarrollo
 npx vitest
+
+# Browser con ventana (los tests de puntero/interacción crudos son más estables así)
+npx vitest --browser.headless=false
 ```
 
 Requiere el proyecto instalado con `@vitest/browser` y Playwright (Chromium).

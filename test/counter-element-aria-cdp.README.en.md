@@ -61,7 +61,7 @@ the "ARIA state matrix" we want to query:
 
 ## 2. File structure
 
-The file has **24 tests** organized in **5 `describe` blocks**:
+The file has **26 tests** organized in **5 `describe` blocks**:
 
 | Block | Topic |
 | ----- | ----- |
@@ -76,8 +76,9 @@ There is also a section of reusable **helpers**:
 - `mountCounter` / `mountStepper`: mount each component via `fixture` from
   `@open-wc/testing-helpers`, which awaits the element's `updateComplete`.
   `afterEach(fixtureCleanup)` removes the mounted fixtures after each test.
-- `getCDPNodeForElement` / `getFullAXTree`: the key CDP pieces (explained in
-  section 6).
+- `getCDPNodeForElement` / `getAXNodeForElement` / `getFullAXTree` /
+  `getPartialAXTree` / `getCDPClickPointForElement`: the key CDP pieces
+  (explained in section 6).
 - `axFind`, `axProperty`, `axValue`: utilities to navigate the AX tree nodes
   returned by CDP.
 
@@ -291,19 +292,22 @@ tree, **with** the test frame's `frameId` to get the iframe's. `DOM.getNodeForLo
 also reports the `frameId` of the node it resolves, which is handy when you
 only have coordinates.
 
-### Targeting a specific node: `getCDPNodeForElement` + `getPartialAXTree` (CDP's "eye")
+### Node identity vs. coordinates: `getCDPNodeForElement` + `getPartialAXTree` (CDP's "eye")
 
-For a **specific element's live AX node**, `getPartialAXTree`/`queryAXTree`
-need a node anchor. We anchor on the element itself by asking Chromium which
-node is **under the cursor** at its center — element resolution and AX pull are
+A recurring trap: `DOM.getNodeForLocation()` is a **hit-test**, not an element
+resolver. With nested Shadow DOM and component overlays, the node under the
+pointer can be a *touch target* or another element above the one the test
+selected. So for a **specific element's live AX node** we do **not** anchor on
+coordinates: we resolve the exact DOM element to its CDP `backendNodeId` and use
+that as the anchor for `getPartialAXTree`. Element resolution and AX pull are
 two separate helpers:
 
 ```ts
 async function getCDPNodeForElement(element) {
-  const rect = element.getBoundingClientRect();
-  const x = Math.round(rect.x + rect.width / 2);
-  const y = Math.round(rect.y + rect.height / 2);
-  return client.send('DOM.getNodeForLocation', {x, y});
+  // 1. attach a temporary unique marker to the exact element
+  // 2. Page.getFrameTree -> one isolated world per frame
+  // 3. Runtime.evaluate: recursive querySelector that pierces open shadow roots
+  // 4. DOM.describeNode({objectId}) -> {backendNodeId, frameId}
 }
 
 async function getPartialAXTree(backendNodeId) {
@@ -312,6 +316,11 @@ async function getPartialAXTree(backendNodeId) {
     fetchRelatives: true,
   });
   return nodes;
+}
+
+async function getAXNodeForElement(element, role, name) {
+  const {backendNodeId} = await getCDPNodeForElement(element);
+  return axFind(await getPartialAXTree(backendNodeId), role, name);
 }
 ```
 
@@ -329,6 +338,8 @@ flowchart TB
         C2["getCDPNodeForElement(element)"]
         C3["getFullAXTree(frameId?)"]
         C4["getPartialAXTree(backendNodeId)"]
+        C5["getAXNodeForElement(element, role, name)"]
+        C6["getCDPClickPointForElement(element)"]
     end
 
     subgraph frames["Frame topology (Page.getFrameTree)"]
@@ -351,15 +362,25 @@ flowchart TB
     C3 -- "no frameId (default)" --> T1
     C3 -- "frameId" --> T2
 
-    C2 -- "frameId" --> C3
-    C2 -- "backendNodeId" --> C4
+    C2 -- "exact backendNodeId" --> C4
+    C5 -- "uses" --> C2
+    C5 -- "backendNodeId" --> C4
     C4 --> T3
+
+    C6 -- "exact backendNodeId + DOM.getContentQuads" --> C2
+    C6 -- "click point (verified in frame)" --> I1["Input.dispatchMouseEvent"]
 ```
 
 - `getTestFrameId()` is confined to the topology/infrastructure tests (dashed
   edge); functional tests resolve the `frameId` from the actual target element.
-- `getCDPNodeForElement` is the functional entry point: `frameId` → full AX
-  tree, `backendNodeId` → local AX subtree.
+- `getCDPNodeForElement` is the functional entry point: it returns the exact
+  element's `backendNodeId` (+ owning `frameId`), independent of geometry or the
+  `vitest-iframe` name.
+- `getAXNodeForElement` composes resolution + AX pull: exact element → live AX
+  node by role and accessible name.
+- `getCDPClickPointForElement` turns the exact node into protocol click
+  coordinates via `DOM.getContentQuads()`, and verifies the point lands in the
+  target frame (hit-test as a *frame* cross-check, not as element resolution).
 - `getFullAXTree(frameId?)` makes the default-root vs. explicit-frame
   distinction explicit.
 
@@ -367,10 +388,9 @@ flowchart TB
 
 **`audits the live progressbar AX node and its valuenow over time`**
 
-- Resolves the `progressbar` with `getCDPNodeForElement`, takes its `frameId` and
-  audits it through the test frame's full AX tree (`getFullAXTree(frameId)` →
-  `axFind(ax, 'progressbar')`), verifying name, value, `valuemax` and
-  `focusable`.
+- Resolves the exact `progressbar` element with `getAXNodeForElement` and audits
+  its live AX node (`getCDPNodeForElement` → `getPartialAXTree` → `axFind`),
+  verifying name, value, `valuemax` and `focusable`.
 - **AX schema finding**: a `progressbar`'s current value is NOT in
   `properties.valuenow` (it does not even exist): it lives in the node's
   top-level **`value`** field. `valuemin`, `valuemax` and `focusable` do live in
@@ -378,14 +398,12 @@ flowchart TB
 - After pressing "Complete session" we **re-query the AX tree** and confirm the
   browser updated its AX cache to `4`, independently of our DOM read. It proves
   **the browser's AX cache is the authoritative source**.
-- `frameId` is truthy: `DOM.getNodeForLocation` reports the frame that owns the
-  node.
 
 **`audits the live accessible name of the material button`**
 
-- Repeats the pattern on `counter-element`: gets the AX node of the material
-  button (two Shadow DOMs deep) and verifies its **computed accessible name** is
-  "Counter: 5".
+- Repeats the pattern on `counter-element`: resolves the exact material button
+  (two Shadow DOMs deep) with `getAXNodeForElement` and verifies its **computed
+  accessible name** is "Counter: 5".
 - After a real click, the new AX node returns "Counter: 6". The accessible name
   Chromium computes **matches Vitest's locator**.
 
@@ -431,11 +449,16 @@ flowchart TB
 
 **`drives a real pointer click with raw Input.dispatchMouseEvent`**
 
+- The click coordinates come from **CDP geometry**, not from
+  `getBoundingClientRect()`: `getCDPClickPointForElement` resolves the exact
+  button (`getCDPNodeForElement`) and reads its quad with
+  `DOM.getContentQuads()`, then verifies the point lands in the target frame.
 - We dispatch `mouseMoved`, `mousePressed` and `mouseReleased` with
   `Input.dispatchMouseEvent` (the exact sequence a real click generates at the
   system level).
-- The counter moves to 6 and the AX tree reflects it. **At the protocol level,
-  without touching the DOM**, we can click.
+- The test asserts the complete browser event sequence (`pointerdown` →
+  `mousedown` → `pointerup` → `mouseup` → `click`) and that the counter moved to
+  6. **At the protocol level, without touching the DOM**, we can click.
 
 **`emulates prefers-reduced-motion and forced-colors at the protocol level`**
 
@@ -483,10 +506,10 @@ version of the snapshot.
 ### `keeps matcher-computed and CDP-computed accessible names in sync`
 
 Closes the loop: the accessible name **Vitest's matcher** computes ("Counter: 5")
-must match the one **CDP computes directly** from the test iframe's full AX tree
-(`getCDPNodeForElement` → `getFullAXTree(frameId)` → `axFind(ax, 'button')?.name?.value`), before and after the
-click. If the two sources diverged, we would have a reliability problem in the
-locator layer.
+must match the one **CDP computes directly** for the exact element's live AX node
+(`getAXNodeForElement` → `getCDPNodeForElement` + `getPartialAXTree` →
+`axFind(..., 'button')?.name?.value`), before and after the click. If the two
+sources diverged, we would have a reliability problem in the locator layer.
 
 ---
 
@@ -497,14 +520,15 @@ locator layer.
 | `cdp()` attaches to the orchestrator page; the test iframe has its own AX tree, reachable via its `frameId`. | Section 6, `getFullAXTree({frameId})` test |
 | `Accessibility.getFullAXTree` / `queryAXTree` without `frameId` only reach the root frame; pass the test frame's `frameId` to see the iframe content. | Section 6 |
 | `Page.getFrameTree` + `Accessibility.getFullAXTree({frameId})` return the test iframe's full AX tree. | `getFullAXTree` helper |
-| `DOM.getNodeForLocation` + `Accessibility.getPartialAXTree` give the "live" AX node of any element (node anchor for `getPartialAXTree`). | `getCDPNodeForElement`/`getPartialAXTree` helpers |
+| `DOM.getNodeForLocation` is a **hit-test**, not an element resolver; resolve the exact element to its `backendNodeId` instead. | `getCDPNodeForElement` helper |
+| Exact `backendNodeId` + `Accessibility.getPartialAXTree` give the "live" AX node of any element. | `getAXNodeForElement`/`getPartialAXTree` helpers |
 | A `progressbar`'s value is in `node.value`, not in `properties.valuenow`. | `valuenow over time` test |
 | The `disabled` filter of `getByRole` ignores `aria-disabled` on non-button widgets. | `filters by disabled state` test |
 | `DOM.querySelector` pierces Shadow DOM only when rooted at the Shadow Root's `nodeId`. | `DOM domain snapshot` test |
 | `DOM.getNodeForLocation` can resolve Material's *touch target* instead of the `<button>`. | `DOM domain snapshot` test |
 | `toHaveFocus` is unreliable for internal Shadow DOM elements; use `shadowRoot.activeElement`. | Space/Enter test |
 | `Emulation.setEmulatedMedia` affects `matchMedia` in real time. | `prefers-reduced-motion` test |
-| `Input.dispatchMouseEvent` generates real clicks at the protocol level. | `dispatchMouseEvent` test |
+| `Input.dispatchMouseEvent` clicks real elements when the coordinates come from `DOM.getContentQuads()` (CDP geometry). | `getCDPClickPointForElement` + `dispatchMouseEvent` test |
 | ARIA locators pierce nested Shadow DOM with no extra configuration. | Block 1 |
 
 ---
@@ -520,6 +544,9 @@ npx vitest run
 
 # Watch mode during development
 npx vitest
+
+# Headed browser (raw pointer/interaction tests are most stable this way)
+npx vitest --browser.headless=false
 ```
 
 Requires the project installed with `@vitest/browser` and Playwright (Chromium).
