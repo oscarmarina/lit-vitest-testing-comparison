@@ -69,12 +69,7 @@ export default defineConfig(({command}) => ({
           browser: 'chromium',
           provider: playwright({
             launchOptions: {
-              args: [
-                '--auto-open-devtools-for-tabs',
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-gpu',
-              ],
+              args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
             },
           }),
         },

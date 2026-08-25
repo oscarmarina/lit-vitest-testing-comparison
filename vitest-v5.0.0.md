@@ -350,3 +350,42 @@ Vitest Beta
 * **browser**: Serve framework assets as immutable  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10729](https://github.com/vitest-dev/vitest/pull/10729) [(7af87)](https://github.com/vitest-dev/vitest/commit/7af8755ae)
 
     **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-beta.7...v5.0.0-rc.1)**
+
+[**v5.0.0-beta.2**](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0-beta.2)
+   **Breaking Changes**
+
+* Default attachmentsDir from .vitest-attachements/ to .vitest/attachments/  \-  by [**@MdSadiqMd**](https://github.com/MdSadiqMd) in [\#10186](https://github.com/vitest-dev/vitest/pull/10186) [(1ba73)](https://github.com/vitest-dev/vitest/commit/1ba7338c3)
+* Remove sequential test/suite options in favor of concurrent  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Codex** in [\#10198](https://github.com/vitest-dev/vitest/pull/10198) [(9229f)](https://github.com/vitest-dev/vitest/commit/9229f2edc)
+* Represent locator as an object instead of a string  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10212](https://github.com/vitest-dev/vitest/pull/10212) [(80f07)](https://github.com/vitest-dev/vitest/commit/80f07edf6)
+* Inline expect package  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10221](https://github.com/vitest-dev/vitest/pull/10221) [(ad162)](https://github.com/vitest-dev/vitest/commit/ad16223e7)
+* Remove deprecated entry points  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10222](https://github.com/vitest-dev/vitest/pull/10222) [(994c6)](https://github.com/vitest-dev/vitest/commit/994c6ddb9)
+* **mocker**: Deserialize automock as automock  \-  by [**@nami8824**](https://github.com/nami8824) in [\#10192](https://github.com/vitest-dev/vitest/pull/10192) [(2f892)](https://github.com/vitest-dev/vitest/commit/2f892712d)
+* **reporters**: blob reporter and \--merge-reports default to .vitest/blob/  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10232](https://github.com/vitest-dev/vitest/pull/10232) [(d22b0)](https://github.com/vitest-dev/vitest/commit/d22b029ae)
+
+   **Features**
+
+* Expose default reporters through configDefaults.reporters  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Claude Sonnet 4.6** in [\#10219](https://github.com/vitest-dev/vitest/pull/10219) [(083f6)](https://github.com/vitest-dev/vitest/commit/083f6bdd6)
+* Support merge reports for non-sharded multi-environment runs (take 2\)  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Claude Sonnet 4.6**, **Codex** and [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10031](https://github.com/vitest-dev/vitest/pull/10031) [(e60b2)](https://github.com/vitest-dev/vitest/commit/e60b2f49e)
+* Add logger.formatError  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Codex** in [\#10268](https://github.com/vitest-dev/vitest/pull/10268) [(2c5f3)](https://github.com/vitest-dev/vitest/commit/2c5f3ee2f)
+* **browser**: Provide project reference in ToMatchScreenshotResolvePath  \-  by [**@macarie**](https://github.com/macarie) and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10138](https://github.com/vitest-dev/vitest/pull/10138) [(16654)](https://github.com/vitest-dev/vitest/commit/166544e39)
+* **coverage**: V8 to track node:child\_process and node:worker\_threads contexts  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#9976](https://github.com/vitest-dev/vitest/pull/9976) [(9baa5)](https://github.com/vitest-dev/vitest/commit/9baa5faba)
+* **junit-reporter**: Add jest-junit-compatible naming options  \-  by [**@neumaennl**](https://github.com/neumaennl), **neumaennl**, [**@neumann4soft**](https://github.com/neumann4soft) and **Copilot** in [\#10189](https://github.com/vitest-dev/vitest/pull/10189) [(27393)](https://github.com/vitest-dev/vitest/commit/273933440)
+
+   **Bug Fixes**
+
+* Global sequence.concurrent: true with top-level test(..., { concurrent: false }) \+ depreacte sequential test API and options  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Codex** and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10194](https://github.com/vitest-dev/vitest/pull/10194) [(9387f)](https://github.com/vitest-dev/vitest/commit/9387f57cf)
+* Test tags options should overwrite inherited suite options \+ inherit suite options in task API  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Codex** in [\#10216](https://github.com/vitest-dev/vitest/pull/10216) [(457db)](https://github.com/vitest-dev/vitest/commit/457db297b)
+* Udpate optimize deps config  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10223](https://github.com/vitest-dev/vitest/pull/10223) [(95dc6)](https://github.com/vitest-dev/vitest/commit/95dc6e3f1)
+* **browser**:
+  * Fix trace highlight of shadow dom on webdriverio  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10227](https://github.com/vitest-dev/vitest/pull/10227) [(b01af)](https://github.com/vitest-dev/vitest/commit/b01afd26c)
+* **deps**:
+  * Update ivya to fix empty aria tree snapshot  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10218](https://github.com/vitest-dev/vitest/pull/10218) [(f7822)](https://github.com/vitest-dev/vitest/commit/f7822ebf6)
+* **runner**:
+  * Propagate chainable flags in describe.for  \-  by @DORI2001, **Dor Alagem** and [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10187](https://github.com/vitest-dev/vitest/pull/10187) [(db678)](https://github.com/vitest-dev/vitest/commit/db67831d7)
+  * Limit concurrency per task branch in addition to per leaf callbacks  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10179](https://github.com/vitest-dev/vitest/pull/10179) [(3112a)](https://github.com/vitest-dev/vitest/commit/3112abea2)
+* **snapshot**:
+  * Treat empty string as valid snapshot  \-  by [**@mayrang**](https://github.com/mayrang) and [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10188](https://github.com/vitest-dev/vitest/pull/10188) [(e145d)](https://github.com/vitest-dev/vitest/commit/e145d5756)
+* **spy**:
+  * Support private method spy types  \-  by [**@cyphercodes**](https://github.com/cyphercodes) in [\#10172](https://github.com/vitest-dev/vitest/issues/10172) and [\#10213](https://github.com/vitest-dev/vitest/pull/10213) [(628ab)](https://github.com/vitest-dev/vitest/commit/628ab32f1)
+
+    **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-beta.1...v5.0.0-beta.2)**
