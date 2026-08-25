@@ -38,25 +38,33 @@ async function getCDPClickPointForElement(element: Element): Promise<{x: number;
 
   const quad = quads[0] as number[];
 
-  // NOTE: `quads[0]` assumes a single content quad. Inline elements that wrap
-  // across lines return several quads; if this helper is generalized to such
-  // elements, pick the quad containing the clickable region instead.
-
   if (quad.length !== 8) {
     throw new Error(`Unexpected quad returned by DOM.getContentQuads: ${JSON.stringify(quad)}`);
   }
 
-  // Quad:
-  // [x1, y1, x2, y2, x3, y3, x4, y4]
-  //
-  // Calculate the center using all four points.
-  const x = (quad[0] + quad[2] + quad[4] + quad[6]) / 4;
+  // 1. Quad center in local frame coordinates
+  let x = (quad[0] + quad[2] + quad[4] + quad[6]) / 4;
+  let y = (quad[1] + quad[3] + quad[5] + quad[7]) / 4;
 
-  const y = (quad[1] + quad[3] + quad[5] + quad[7]) / 4;
+  // 2. Add iframe offset relative to global Viewport if running inside a subframe
+  const {frameTree} = await client.send('Page.getFrameTree');
+  if (frameTree.frame.id !== frameId) {
+    const {node} = await client.send('DOM.getFrameOwner', {frameId});
+    if (node?.backendNodeId) {
+      const {model} = await client.send('DOM.getBoxModel', {backendNodeId: node.backendNodeId});
+      // model.content contains [x1, y1, x2, y2, x3, y3, x4, y4] of the iframe container
+      x += model.content[0];
+      y += model.content[1];
+    }
+  }
 
+  const roundX = Math.round(x);
+  const roundY = Math.round(y);
+
+  // 3. Verification hit-testing
   const hit = await client.send('DOM.getNodeForLocation', {
-    x: Math.round(x),
-    y: Math.round(y),
+    x: roundX,
+    y: roundY,
     includeUserAgentShadowDOM: true,
   });
 
@@ -66,7 +74,7 @@ async function getCDPClickPointForElement(element: Element): Promise<{x: number;
         'CDP click coordinates do not land in the target frame.',
         `Expected frame: ${frameId}`,
         `Actual frame: ${hit.frameId}`,
-        `Point: ${Math.round(x)}, ${Math.round(y)}`,
+        `Point: ${roundX}, ${roundY}`,
         `Target backendNodeId: ${backendNodeId}`,
         `Hit backendNodeId: ${hit.backendNodeId}`,
       ].join('\n')
@@ -74,8 +82,8 @@ async function getCDPClickPointForElement(element: Element): Promise<{x: number;
   }
 
   return {
-    x: Math.round(x),
-    y: Math.round(y),
+    x: roundX,
+    y: roundY,
   };
 }
 
@@ -96,10 +104,6 @@ interface AXNode {
   role?: {value: string};
   name?: {value: string};
 
-  /**
-   * Widget values such as progressbar `aria-valuenow` are exposed as the
-   * top-level AX `value`.
-   */
   value?: {
     type: string;
     value: unknown;
@@ -276,14 +280,12 @@ async function getCDPNodeForElement(element: Element): Promise<CDPNodeLocation> 
   await client.send('DOM.enable');
 
   const markerName = 'data-vitest-cdp-target';
-
   const markerValue = `vitest-cdp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
   element.setAttribute(markerName, markerValue);
 
   try {
     const {frameTree} = await client.send('Page.getFrameTree');
-
     const frameIds = collectFrameIds(frameTree);
 
     for (const frameId of frameIds) {
@@ -384,9 +386,7 @@ async function getAXNodeForElement(
   name?: string
 ): Promise<AXNode | undefined> {
   const {backendNodeId} = await getCDPNodeForElement(element);
-
   const nodes = await getPartialAXTree(backendNodeId);
-
   return axFind(nodes, role, name);
 }
 
@@ -396,7 +396,6 @@ async function getAXNodeForElement(
 
 describe('ARIA locators pierce nested Shadow DOM', () => {
   beforeEach(mountCounter);
-
   afterEach(fixtureCleanup);
 
   it('finds the internal <h1> by role, level and accessible name', async () => {
@@ -406,9 +405,7 @@ describe('ARIA locators pierce nested Shadow DOM', () => {
     });
 
     await expect.element(heading).toHaveRole('heading');
-
     await expect.element(heading).toHaveAccessibleName('Hello, Hey there!');
-
     await expect.element(heading).toHaveTextContent('Hello, Hey there!');
   });
 
@@ -418,17 +415,14 @@ describe('ARIA locators pierce nested Shadow DOM', () => {
     });
 
     await expect.element(button).toBeEnabled();
-
     await expect.element(button).toHaveAccessibleName('Counter: 5');
   });
 
   it('prunes aria-hidden nodes but keeps composed slotted light DOM', async () => {
     const el = document.querySelector('counter-element')!;
-
     expect(page.getByRole('separator').query()).toBeNull();
 
     const tree = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
-
     expect(tree).toContain('- text: light-dom');
   });
 });
@@ -449,9 +443,7 @@ describe('Interactive accessibility state changes', () => {
     });
 
     await expect.element(collapsed).toBeVisible();
-
     await userEvent.click(collapsed);
-
     await el.updateComplete;
 
     expect(
@@ -469,7 +461,6 @@ describe('Interactive accessibility state changes', () => {
     });
 
     await expect.element(expanded).toHaveAttribute('aria-expanded', 'true');
-
     await expect
       .element(
         page.getByRole('progressbar', {
@@ -485,7 +476,6 @@ describe('Interactive accessibility state changes', () => {
         name: 'Show session panel',
       })
     );
-
     await el.updateComplete;
 
     await expect
@@ -501,7 +491,6 @@ describe('Interactive accessibility state changes', () => {
         name: 'Hide session panel',
       })
     );
-
     await el.updateComplete;
 
     await expect
@@ -528,11 +517,9 @@ describe('Interactive accessibility state changes', () => {
         name: 'Show session panel',
       })
     );
-
     await el.updateComplete;
 
     el.disabled = true;
-
     await el.updateComplete;
 
     await expect
@@ -596,7 +583,6 @@ describe('Interactive accessibility state changes', () => {
         name: 'Show session panel',
       })
     );
-
     await el.updateComplete;
 
     const meter = page.getByRole('progressbar', {
@@ -604,9 +590,7 @@ describe('Interactive accessibility state changes', () => {
     });
 
     await expect.element(meter).toHaveAttribute('aria-valuenow', '3');
-
     await expect.element(meter).toHaveAttribute('aria-valuetext', '3 of 10 sessions completed');
-
     await expect.element(page.getByRole('status')).toHaveTextContent('3 of 10 sessions completed');
 
     await userEvent.click(
@@ -614,11 +598,9 @@ describe('Interactive accessibility state changes', () => {
         name: 'Complete session',
       })
     );
-
     await el.updateComplete;
 
     await expect.element(meter).toHaveAttribute('aria-valuenow', '4');
-
     await expect.element(page.getByRole('status')).toHaveTextContent('4 of 10 sessions completed');
   });
 
@@ -628,6 +610,7 @@ describe('Interactive accessibility state changes', () => {
         name: 'Show session panel',
       })
     );
+    await el.updateComplete;
 
     await expect
       .element(page.getByLabelText('Session progress'))
@@ -636,14 +619,14 @@ describe('Interactive accessibility state changes', () => {
 
   it('reflects counter changes in the accessible name of the material button', async () => {
     fixtureCleanup();
-
-    await mountCounter();
+    const counterEl = await mountCounter();
 
     await userEvent.click(
       page.getByRole('button', {
         name: 'Counter: 5',
       })
     );
+    await counterEl.updateComplete;
 
     await expect
       .element(
@@ -659,13 +642,14 @@ describe('Real user interactions (userEvent)', () => {
   afterEach(fixtureCleanup);
 
   it('increments with a real pointer click and double click', async () => {
-    await mountCounter();
+    const counterEl = await mountCounter();
 
     await userEvent.click(
       page.getByRole('button', {
         name: 'Counter: 5',
       })
     );
+    await counterEl.updateComplete;
 
     await expect
       .element(
@@ -680,6 +664,7 @@ describe('Real user interactions (userEvent)', () => {
         name: 'Counter: 6',
       })
     );
+    await counterEl.updateComplete;
 
     await expect
       .element(
@@ -694,11 +679,9 @@ describe('Real user interactions (userEvent)', () => {
     const el = await mountStepper();
 
     await userEvent.tab();
-
     expect(el.shadowRoot?.activeElement?.id).toBe('toggle');
 
     await userEvent.keyboard('{Enter}');
-
     await el.updateComplete;
 
     await expect
@@ -712,7 +695,6 @@ describe('Real user interactions (userEvent)', () => {
     expect(el.shadowRoot?.activeElement?.id).toBe('complete');
 
     await userEvent.keyboard(' ');
-
     await el.updateComplete;
 
     await expect
@@ -732,11 +714,9 @@ describe('Real user interactions (userEvent)', () => {
         name: 'Show session panel',
       })
     );
-
     await el.updateComplete;
 
     await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
-
     expect(el.shadowRoot?.activeElement?.id).toBe('meter');
 
     const meter = page.getByRole('progressbar', {
@@ -744,21 +724,15 @@ describe('Real user interactions (userEvent)', () => {
     });
 
     await userEvent.keyboard('{ArrowRight}');
-
     await el.updateComplete;
-
     await expect.element(meter).toHaveAttribute('aria-valuenow', '4');
 
     await userEvent.keyboard('{ArrowLeft}');
-
     await el.updateComplete;
-
     await expect.element(meter).toHaveAttribute('aria-valuenow', '3');
 
     await userEvent.keyboard('a');
-
     await el.updateComplete;
-
     await expect.element(meter).toHaveAttribute('aria-valuenow', '3');
   });
 
@@ -766,7 +740,6 @@ describe('Real user interactions (userEvent)', () => {
     const el = await fixture<FocusStepper>(html`
       <focus-stepper step="2" max="5" expanded></focus-stepper>
     `);
-
     await el.updateComplete;
 
     await userEvent.click(
@@ -774,9 +747,7 @@ describe('Real user interactions (userEvent)', () => {
         name: 'Complete session',
       })
     );
-
     await el.updateComplete;
-
     expect(el.value).toBe(5);
 
     await userEvent.click(
@@ -784,9 +755,7 @@ describe('Real user interactions (userEvent)', () => {
         name: 'Complete session',
       })
     );
-
     await el.updateComplete;
-
     expect(el.value).toBe(5);
   });
 
@@ -800,11 +769,9 @@ describe('Real user interactions (userEvent)', () => {
     expect(button.element().matches(':hover')).toBe(false);
 
     await userEvent.hover(button);
-
     expect(button.element().matches(':hover')).toBe(true);
 
     await userEvent.unhover(button);
-
     expect(button.element().matches(':hover')).toBe(false);
   });
 });
@@ -820,7 +787,6 @@ describe('CDP deep dive (Chromium only)', () => {
         name: 'Show session panel',
       })
     );
-
     await el.updateComplete;
 
     const getMeter = async () =>
@@ -835,15 +801,10 @@ describe('CDP deep dive (Chromium only)', () => {
       );
 
     const meter = await getMeter();
-
     expect(meter).toBeDefined();
-
     expect(meter?.name?.value).toBe('Session progress');
-
     expect(axValue(meter!)).toBe(3);
-
     expect(axProperty(meter!, 'valuemax')).toBe(10);
-
     expect(axProperty(meter!, 'focusable')).toBe(true);
 
     await userEvent.click(
@@ -851,28 +812,22 @@ describe('CDP deep dive (Chromium only)', () => {
         name: 'Complete session',
       })
     );
-
     await el.updateComplete;
 
     const updatedMeter = await getMeter();
-
     expect(updatedMeter).toBeDefined();
-
     expect(axValue(updatedMeter!)).toBe(4);
   });
 
   it('audits the live accessible name of the material button', async () => {
-    await mountCounter();
+    const counterEl = await mountCounter();
 
     const getButton = async (name: string) =>
       getAXNodeForElement(page.getByRole('button', {name}).element(), 'button', name);
 
     const buttonAx = await getButton('Counter: 5');
-
     expect(buttonAx).toBeDefined();
-
     expect(buttonAx?.name?.value).toBe('Counter: 5');
-
     expect(axProperty(buttonAx!, 'focusable')).toBe(true);
 
     await userEvent.click(
@@ -880,11 +835,10 @@ describe('CDP deep dive (Chromium only)', () => {
         name: 'Counter: 5',
       })
     );
+    await counterEl.updateComplete;
 
     const buttonAfter = await getButton('Counter: 6');
-
     expect(buttonAfter).toBeDefined();
-
     expect(buttonAfter?.name?.value).toBe('Counter: 6');
   });
 
@@ -892,13 +846,10 @@ describe('CDP deep dive (Chromium only)', () => {
     await client.send('Page.enable');
 
     const {frameTree} = await client.send('Page.getFrameTree');
-
     expect(frameTree.frame.id).toBeTruthy();
-
     expect(frameTree.childFrames?.length ?? 0).toBeGreaterThan(0);
 
     const testFrameId = await getTestFrameId();
-
     expect(testFrameId).not.toBe(frameTree.frame.id);
 
     const findFrame = (node: FrameNode): FrameNode | undefined => {
@@ -908,7 +859,6 @@ describe('CDP deep dive (Chromium only)', () => {
 
       for (const child of node.childFrames ?? []) {
         const found = findFrame(child);
-
         if (found) {
           return found;
         }
@@ -924,21 +874,16 @@ describe('CDP deep dive (Chromium only)', () => {
     await mountCounter();
 
     const rootNodes = await getFullAXTree();
-
     expect(rootNodes.some((node) => node.role?.value === 'RootWebArea')).toBe(true);
-
     expect(rootNodes.some((node) => node.role?.value === 'Iframe')).toBe(true);
-
     expect(rootNodes.some((node) => node.name?.value === 'Counter: 5')).toBe(false);
 
     const testFrameId = await getTestFrameId();
-
     const testNodes = await getFullAXTree(testFrameId);
 
     expect(testNodes.some((node) => node.role?.value === 'RootWebArea')).toBe(true);
 
     const button = axFind(testNodes, 'button', 'Counter: 5');
-
     expect(button?.name?.value).toBe('Counter: 5');
   });
 
@@ -953,17 +898,13 @@ describe('CDP deep dive (Chromium only)', () => {
     });
 
     const host = nodes.find((node: {localName?: string}) => node.localName === 'counter-element');
-
     expect(host).toBeDefined();
-
     expect(host.shadowRoots.length).toBeGreaterThan(0);
 
     const materialHost = nodes.find(
       (node: {localName?: string}) => node.localName === 'md-filled-button'
     );
-
     expect(materialHost).toBeDefined();
-
     expect(materialHost.shadowRoots.length).toBeGreaterThan(0);
 
     const materialShadowRoot = materialHost.shadowRoots[0];
@@ -972,13 +913,11 @@ describe('CDP deep dive (Chromium only)', () => {
       nodeId: materialShadowRoot.nodeId,
       selector: 'button',
     });
-
     expect(nodeId).toBeGreaterThan(0);
 
     const {node} = await client.send('DOM.describeNode', {
       nodeId,
     });
-
     expect(node.localName).toBe('button');
   });
 
@@ -998,27 +937,11 @@ describe('CDP deep dive (Chromium only)', () => {
     const events: string[] = [];
 
     button.addEventListener('pointerdown', () => events.push('pointerdown'));
-
     button.addEventListener('mousedown', () => events.push('mousedown'));
-
     button.addEventListener('pointerup', () => events.push('pointerup'));
-
     button.addEventListener('mouseup', () => events.push('mouseup'));
-
     button.addEventListener('click', () => events.push('click'));
-
     el.addEventListener('click', () => events.push('host-click'));
-
-    /*
-  console.log({
-    tagName: button.tagName,
-    localName: button.localName,
-    outerHTML: button.outerHTML,
-    root:
-      button.getRootNode() instanceof ShadowRoot
-        ? 'shadow-root'
-        : 'document',
-  }); */
 
     await client.send('Input.dispatchMouseEvent', {
       type: 'mouseMoved',
@@ -1063,7 +986,6 @@ describe('CDP deep dive (Chromium only)', () => {
     await mountStepper();
 
     expect(matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(false);
-
     expect(matchMedia('(forced-colors: active)').matches).toBe(false);
 
     try {
@@ -1084,7 +1006,6 @@ describe('CDP deep dive (Chromium only)', () => {
       await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
       expect(matchMedia('(prefers-reduced-motion: reduce)').matches).toBe(true);
-
       expect(matchMedia('(forced-colors: active)').matches).toBe(true);
     } finally {
       await client.send('Emulation.setEmulatedMedia', {
@@ -1108,7 +1029,6 @@ describe('CDP deep dive (Chromium only)', () => {
         name: 'Show session panel',
       })
     );
-
     await el.updateComplete;
 
     await userEvent.click(
@@ -1116,6 +1036,7 @@ describe('CDP deep dive (Chromium only)', () => {
         name: 'Complete session',
       })
     );
+    await el.updateComplete;
 
     expect(spy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -1141,7 +1062,6 @@ describe('Accessibility tree snapshots & matching', () => {
         name: 'Show session panel',
       })
     );
-
     await el.updateComplete;
 
     await expect.element(page.elementLocator(el)).toMatchAriaInlineSnapshot(`
@@ -1159,15 +1079,11 @@ describe('Accessibility tree snapshots & matching', () => {
         name: 'Show session panel',
       })
     );
-
     await el.updateComplete;
 
     const tree = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
-
     expect(tree).toContain('- progressbar "Session progress"');
-
     expect(tree).toContain('- status');
-
     expect(tree).toContain('3 of 10 sessions completed');
 
     await userEvent.click(
@@ -1175,18 +1091,16 @@ describe('Accessibility tree snapshots & matching', () => {
         name: 'Complete session',
       })
     );
-
     await el.updateComplete;
 
     const treeAfter = utils.aria.renderAriaTree(utils.aria.generateAriaTree(el));
-
     expect(treeAfter).toContain('4 of 10 sessions completed');
   });
 
   it('keeps matcher-computed and CDP-computed accessible names in sync', async () => {
     fixtureCleanup();
 
-    await mountCounter();
+    const counterEl = await mountCounter();
 
     const getButton = (name: string) => page.getByRole('button', {name});
 
@@ -1201,6 +1115,8 @@ describe('Accessibility tree snapshots & matching', () => {
     expect(buttonAx?.name?.value).toBe('Counter: 5');
 
     await userEvent.click(button);
+
+    await counterEl.updateComplete;
 
     const updatedButton = getButton('Counter: 6');
 
