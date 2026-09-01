@@ -3,7 +3,7 @@
 **Empirical knowledge, not release notes.** This document collects the real
 behavior of Vitest 5 (and its providers) discovered while testing with Web
 Components, Shadow DOM and Chromium. It is the operational complement to
-[`VITEST_5_TECHNICAL_HANDBOOK.md`](./VITEST_5_TECHNICAL_HANDBOOK.md): there you
+[`VITEST_5_TECHNICAL_HANDBOOK.en.md`](./VITEST_5_TECHNICAL_HANDBOOK.en.md): there you
 will find "what changed in v5"; here you will find "what it actually does and
 how not to lose a day rediscovering it".
 
@@ -12,7 +12,7 @@ how not to lose a day rediscovering it".
 Empirical knowledge expires: before trusting these entries after any version
 bump, re-run the evidence tests.
 
-**Verification versioning:** `5.0.0-rc.1`, Chromium/Playwright 1.62.
+**Verification versioning:** `5.0.0-rc.4`
 
 ---
 
@@ -728,6 +728,57 @@ the tested composed content:
 
 ---
 
+### F12. Trace recording can make the first CDP geometry lookup return no quads
+
+**Symptom.** With `browser.trace: 'on'`, `DOM.getContentQuads()` can return an
+empty `quads` array for a freshly resolved element. The same complete file
+passes with `--browser.trace=off`, while the trace-enabled failure reports a
+valid `backendNodeId` but no geometry.
+
+**Observed cause boundary.** In `5.0.0-rc.4`, the failure appeared after earlier
+tests had generated trace activity. It was not tied to one preceding CDP
+command, and keeping the original `RemoteObject` alive was insufficient by
+itself. The evidence establishes a transient trace/geometry interaction; it
+does not establish which Vitest, Playwright or Chromium trace stage causes it.
+
+**Fix.** Keep the CDP `RemoteObject` alive while requesting its geometry. If
+the result has no quads, wait for the next animation frame and resolve the DOM
+element to a new CDP object before retrying. Bound the operation and fail if no
+attempt produces layout geometry:
+
+```ts
+for (let attempt = 0; attempt < 3; attempt += 1) {
+  const geometry = await resolveAndReadQuads(element);
+
+  if (geometry.quads.length) {
+    return geometry;
+  }
+
+  await new Promise<void>((resolve) =>
+    requestAnimationFrame(() => resolve())
+  );
+}
+
+throw new Error(
+  'DOM.getContentQuads returned no geometry after 3 element resolutions'
+);
+```
+
+Do not retry the same detached identifier indefinitely. Each attempt should
+re-establish the element-to-CDP correlation, consume it before releasing the
+remote object, and have a fixed upper bound.
+
+**Evidence.** `test/counter-element-aria-cdp.test.ts` (helpers
+`withCDPNodeForElement` and `getCDPClickPointForElement`; test `drives a real
+pointer click with raw Input.dispatchMouseEvent`). Before the fix, trace-enabled
+stress produced 4 geometry failures in 25 repetitions and the complete file
+failed; with trace disabled, all 26 tests passed. After the fix, the complete
+trace-enabled project passed all 37 tests.
+
+**Verified in.** `5.0.0-rc.4`, Chromium/Playwright 1.62.
+
+---
+
 ## Quick reference
 
 | Symptom | Entry |
@@ -743,6 +794,7 @@ the tested composed content:
 | Test `prefers-reduced-motion` / `forced-colors` | [F9](#f9-emulationsetemulatedmedia-affected-matchmedia-in-real-time) |
 | Exact `getByText` does not find slotted text | [F10](#f10-exact-getbytext-did-not-resolve-slotted-text-in-the-tested-component-structure) |
 | Find/in-snapshot elements inside nested Shadow DOM | [F11](#f11-positive-pattern-aria-locators-pierce-nested-shadow-dom) |
+| `DOM.getContentQuads` intermittently returns no geometry with traces enabled | [F12](#f12-trace-recording-can-make-the-first-cdp-geometry-lookup-return-no-quads) |
 
 ---
 
@@ -812,7 +864,7 @@ promise chain is properly awaited before blaming the component.
 
 ## How to add an entry
 
-Follow the F1-F11 entry template:
+Follow the F1-F12 entry template:
 
 1. Observable **Symptom** — including where it appears: runner, matcher, CDP,
    browser or component.

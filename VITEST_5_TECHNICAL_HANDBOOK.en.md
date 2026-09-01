@@ -1,13 +1,13 @@
 # Vitest 5: Maintainer-Level Technical Handbook
 
-## Beta.1 through beta.6
+## Beta.1 through rc.4
 
 **Audience:** library and framework authors who need to reason about Vitest's
 execution model, not just consume its public API.
 
 **Evidence policy:** statements about a release change are grounded in the PR/commit,
 tagged source, tests, or documentation recorded in
-[the research ledger](./VITEST_5_RESEARCH_LEDGER.md). Where a PR's public discussion
+[the local v5 release ledger](./vitest-v5.0.0.md). Where a PR's public discussion
 does not establish a rationale, this handbook labels the conclusion as an inference
 from the implementation rather than attributing it to maintainers.
 
@@ -1145,6 +1145,26 @@ await expect.poll(async ({ signal }) => fetch('/health', { signal }), { timeout:
 
 # 8. Reliability, diagnostics, and performance catalog
 
+## 8.1 Post-beta.6 migration delta
+
+The release candidates add compatibility and collection contracts that are material
+to a final v5 migration. Beta.7 separates config resolution from server creation,
+adds opt-in `injectCjsGlobals`, promotes `fsModuleCache` to a top-level option, and
+permits non-ASCII `test.for`/`test.each` title placeholders. It also adds a pluggable
+benchmark-provider API.
+
+rc.1 makes inline projects extend the root config by default, supports nested
+projects, changes `-t` hierarchy separators to `>`, shares the Vite server between
+inline projects, and fails an asynchronous assertion that is not awaited. rc.2
+restores the global lifecycle concurrency limit. rc.3 promotes `parseSpecifications`
+and `clearCache` out of experimental and moves Istanbul coverage to
+`@vitest/istanbuljs` packages. rc.4 makes `vitest list` parse files statically by
+default and propagates `--maxWorkers` to projects.
+
+Treat these as upgrade checks: test inline/nested project inheritance, await every
+async assertion, update scripts that filter nested test names, and verify custom
+coverage or cache integrations against the final package surface.
+
 The remaining release items are small in diff size but protect critical boundaries:
 
 - #9870 TypeScript build mode; #10449 unifies typechecking and AST collection;
@@ -1194,9 +1214,9 @@ The remaining release items are small in diff size but protect critical boundari
 
 ## 10.2 Reference map
 
-The exhaustive beta.1-beta.6 release-note-to-PR/commit index is maintained in
-[the research ledger](./VITEST_5_RESEARCH_LEDGER.md). Primary source at the studied
-tag is [vitest-dev/vitest v5.0.0-beta.6](https://github.com/vitest-dev/vitest/tree/v5.0.0-beta.6);
+The beta.1-rc.4 release-note-to-PR/commit index is maintained in
+[the local v5 release ledger](./vitest-v5.0.0.md). Primary source at the studied
+release is [vitest-dev/vitest v5.0.0-rc.4](https://github.com/vitest-dev/vitest/tree/v5.0.0-rc.4);
 the main historical Browser Mode rationale is
 [Discussion #5828](https://github.com/vitest-dev/vitest/discussions/5828), and the
 benchmark API discussion linked by its PR is

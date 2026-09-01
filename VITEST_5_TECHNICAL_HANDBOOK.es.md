@@ -1,14 +1,14 @@
 # Vitest 5: Manual técnico para mantenedores
 
-## De beta.1 a beta.6
+## De beta.1 a rc.4
 
 **Audiencia:** autores de librerías y frameworks que necesitan razonar sobre el
 modelo de ejecución de Vitest, no solo consumir su API pública.
 
 **Política de evidencia:** las afirmaciones sobre un cambio de versión están
 ancladas en el PR/commit, en el código etiquetado, en los tests o en la
-documentación registrados en [el registro de investigación
-(`VITEST_5_RESEARCH_LEDGER.md`)](./VITEST_5_RESEARCH_LEDGER.md). Cuando la
+documentación registrados en [el registro local de releases v5](./vitest-v5.0.0.md).
+Cuando la
 discusión pública de un PR no establece una justificación, este manual etiqueta
 la conclusión como una *inferencia* a partir de la implementación, en lugar de
 atribuirla a los mantenedores.
@@ -1270,6 +1270,28 @@ await expect.poll(async ({ signal }) => fetch('/health', { signal }), { timeout:
 
 # 8. Catálogo de fiabilidad, diagnósticos y rendimiento
 
+## 8.1 Delta de migración posterior a beta.6
+
+Las release candidates añaden contratos de compatibilidad y recolección que son
+materiales para una migración final a v5. Beta.7 separa la resolución de config de
+la creación del server, añade `injectCjsGlobals` opcional, promociona
+`fsModuleCache` a una opción de nivel superior y permite placeholders no ASCII en
+los títulos de `test.for`/`test.each`. También añade una API de provider de
+benchmark conectable.
+
+rc.1 hace que los proyectos inline extiendan la config raíz por defecto, soporta
+proyectos anidados, cambia el separador jerárquico de `-t` a `>`, comparte el server
+de Vite entre proyectos inline y falla ante una assertion asíncrona no esperada.
+rc.2 restaura el límite global de concurrencia del ciclo de vida. rc.3 promociona
+`parseSpecifications` y `clearCache` fuera de experimental y mueve la cobertura
+Istanbul a los paquetes `@vitest/istanbuljs`. rc.4 hace que `vitest list` analice
+los archivos estáticamente por defecto y propaga `--maxWorkers` a los proyectos.
+
+Trata estos cambios como comprobaciones de upgrade: prueba la herencia de proyectos
+inline/anidados, espera toda assertion asíncrona, actualiza los scripts que filtran
+nombres de test anidados y verifica las integraciones custom de cobertura o caché
+contra la superficie final de paquetes.
+
 Los elementos restantes de la versión son pequeños en tamaño de diff pero
 protegen fronteras críticas:
 
@@ -1342,10 +1364,10 @@ protegen fronteras críticas:
 
 ## 10.2 Mapa de referencias
 
-El índice exhaustivo de notas de versión beta.1-beta.6 a PR/commit se mantiene
-en [el registro de investigación (`VITEST_5_RESEARCH_LEDGER.md`)](./VITEST_5_RESEARCH_LEDGER.md).
-La fuente primaria en el tag estudiado es
-[vitest-dev/vitest v5.0.0-beta.6](https://github.com/vitest-dev/vitest/tree/v5.0.0-beta.6);
+El índice de notas de versión beta.1-rc.4 a PR/commit se mantiene en
+[el registro local de releases v5](./vitest-v5.0.0.md). La fuente primaria en el
+release estudiado es
+[vitest-dev/vitest v5.0.0-rc.4](https://github.com/vitest-dev/vitest/tree/v5.0.0-rc.4);
 la justificación histórica principal de Browser Mode es
 [Discussion #5828](https://github.com/vitest-dev/vitest/discussions/5828), y la
 discusión de la API de benchmark enlazada por su PR es

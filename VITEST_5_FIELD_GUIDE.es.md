@@ -12,7 +12,7 @@ el *arreglo*, el *test que lo demuestra* y la *versión* donde fue verificado.
 El conocimiento empírico caduca: ante cada bump de versión, re-ejecuta los
 tests de evidencia antes de confiar en estas entradas.
 
-**Versionado de verificación:** `5.0.0-rc.1`, Chromium/Playwright 1.62.
+**Versionado de verificación:** `5.0.0-rc.4`
 
 ---
 
@@ -736,6 +736,57 @@ el contenido compuesto probado:
 
 ---
 
+### F12. La grabación de traces puede hacer que la primera consulta de geometría CDP no devuelva quads
+
+**Síntoma.** Con `browser.trace: 'on'`, `DOM.getContentQuads()` puede devolver
+un array `quads` vacío para un elemento recién resuelto. El mismo archivo
+completo pasa con `--browser.trace=off`, mientras el fallo con trace informa de
+un `backendNodeId` válido pero sin geometría.
+
+**Límite de causa observado.** En `5.0.0-rc.4`, el fallo apareció después de
+que tests anteriores generasen actividad de trace. No estaba ligado a un único
+comando CDP previo, y mantener vivo el `RemoteObject` original no bastó por sí
+solo. La evidencia establece una interacción transitoria entre trace y
+geometría; no establece qué etapa de Vitest, Playwright o Chromium la causa.
+
+**Arreglo.** Mantén vivo el `RemoteObject` CDP mientras solicitas su geometría.
+Si el resultado no tiene quads, espera al siguiente frame de animación y vuelve
+a resolver el elemento DOM a un nuevo objeto CDP antes de reintentar. Acota la
+operación y falla si ningún intento produce geometría de layout:
+
+```ts
+for (let attempt = 0; attempt < 3; attempt += 1) {
+  const geometry = await resolveAndReadQuads(element);
+
+  if (geometry.quads.length) {
+    return geometry;
+  }
+
+  await new Promise<void>((resolve) =>
+    requestAnimationFrame(() => resolve())
+  );
+}
+
+throw new Error(
+  'DOM.getContentQuads returned no geometry after 3 element resolutions'
+);
+```
+
+No reintentes indefinidamente el mismo identificador separado. Cada intento
+debe restablecer la correlación elemento-CDP, consumirla antes de liberar el
+objeto remoto y tener un límite fijo.
+
+**Evidencia.** `test/counter-element-aria-cdp.test.ts` (helpers
+`withCDPNodeForElement` y `getCDPClickPointForElement`; test `drives a real
+pointer click with raw Input.dispatchMouseEvent`). Antes del arreglo, el estrés
+con traces produjo 4 fallos de geometría en 25 repeticiones y falló el archivo
+completo; con trace desactivado, los 26 tests pasaron. Después del arreglo, el
+proyecto completo con trace pasó sus 37 tests.
+
+**Verificado en.** `5.0.0-rc.4`, Chromium/Playwright 1.62.
+
+---
+
 ## Referencia rápida
 
 | Síntoma | Entrada |
@@ -751,6 +802,7 @@ el contenido compuesto probado:
 | Probar `prefers-reduced-motion` / `forced-colors` | [F9](#f9-emulationsetemulatedmedia-afectó-a-matchmedia-en-tiempo-real) |
 | El `getByText` exacto no encuentra texto con `slot` | [F10](#f10-el-getbytext-exacto-no-resolvió-texto-con-slot-en-la-estructura-probada) |
 | Buscar/en-snapshot elementos dentro del Shadow DOM anidado | [F11](#f11-patrón-positivo-los-locators-aria-perforan-el-shadow-dom-anidado) |
+| `DOM.getContentQuads` no devuelve geometría intermitentemente con traces activos | [F12](#f12-la-grabación-de-traces-puede-hacer-que-la-primera-consulta-de-geometría-cdp-no-devuelva-quads) |
 
 ---
 
@@ -823,7 +875,7 @@ esperada antes de culpar al componente.
 
 ## Cómo añadir una entrada
 
-Sigue la plantilla de las entradas F1-F11:
+Sigue la plantilla de las entradas F1-F12:
 
 1. **Síntoma** observable — incluyendo dónde aparece: runner, matcher, CDP,
    browser o componente.
