@@ -351,41 +351,114 @@ Vitest Beta
 
     **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-beta.7...v5.0.0-rc.1)**
 
-[**v5.0.0-beta.2**](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0-beta.2)
-   **Breaking Changes**
-
-* Default attachmentsDir from .vitest-attachements/ to .vitest/attachments/  \-  by [**@MdSadiqMd**](https://github.com/MdSadiqMd) in [\#10186](https://github.com/vitest-dev/vitest/pull/10186) [(1ba73)](https://github.com/vitest-dev/vitest/commit/1ba7338c3)
-* Remove sequential test/suite options in favor of concurrent  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Codex** in [\#10198](https://github.com/vitest-dev/vitest/pull/10198) [(9229f)](https://github.com/vitest-dev/vitest/commit/9229f2edc)
-* Represent locator as an object instead of a string  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10212](https://github.com/vitest-dev/vitest/pull/10212) [(80f07)](https://github.com/vitest-dev/vitest/commit/80f07edf6)
-* Inline expect package  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10221](https://github.com/vitest-dev/vitest/pull/10221) [(ad162)](https://github.com/vitest-dev/vitest/commit/ad16223e7)
-* Remove deprecated entry points  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10222](https://github.com/vitest-dev/vitest/pull/10222) [(994c6)](https://github.com/vitest-dev/vitest/commit/994c6ddb9)
-* **mocker**: Deserialize automock as automock  \-  by [**@nami8824**](https://github.com/nami8824) in [\#10192](https://github.com/vitest-dev/vitest/pull/10192) [(2f892)](https://github.com/vitest-dev/vitest/commit/2f892712d)
-* **reporters**: blob reporter and \--merge-reports default to .vitest/blob/  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10232](https://github.com/vitest-dev/vitest/pull/10232) [(d22b0)](https://github.com/vitest-dev/vitest/commit/d22b029ae)
-
+[**v5.0.0-rc.2**](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0-rc.2)
    **Features**
 
-* Expose default reporters through configDefaults.reporters  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Claude Sonnet 4.6** in [\#10219](https://github.com/vitest-dev/vitest/pull/10219) [(083f6)](https://github.com/vitest-dev/vitest/commit/083f6bdd6)
-* Support merge reports for non-sharded multi-environment runs (take 2\)  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Claude Sonnet 4.6**, **Codex** and [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10031](https://github.com/vitest-dev/vitest/pull/10031) [(e60b2)](https://github.com/vitest-dev/vitest/commit/e60b2f49e)
-* Add logger.formatError  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Codex** in [\#10268](https://github.com/vitest-dev/vitest/pull/10268) [(2c5f3)](https://github.com/vitest-dev/vitest/commit/2c5f3ee2f)
-* **browser**: Provide project reference in ToMatchScreenshotResolvePath  \-  by [**@macarie**](https://github.com/macarie) and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10138](https://github.com/vitest-dev/vitest/pull/10138) [(16654)](https://github.com/vitest-dev/vitest/commit/166544e39)
-* **coverage**: V8 to track node:child\_process and node:worker\_threads contexts  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#9976](https://github.com/vitest-dev/vitest/pull/9976) [(9baa5)](https://github.com/vitest-dev/vitest/commit/9baa5faba)
-* **junit-reporter**: Add jest-junit-compatible naming options  \-  by [**@neumaennl**](https://github.com/neumaennl), **neumaennl**, [**@neumann4soft**](https://github.com/neumann4soft) and **Copilot** in [\#10189](https://github.com/vitest-dev/vitest/pull/10189) [(27393)](https://github.com/vitest-dev/vitest/commit/273933440)
+* **reporter**: Add custom GitHub Actions summary title  \-  by [**@heyJonBray**](https://github.com/heyJonBray) and [**@macarie**](https://github.com/macarie) in [\#10891](https://github.com/vitest-dev/vitest/pull/10891) [(4363c)](https://github.com/vitest-dev/vitest/commit/4363cdb49)
 
    **Bug Fixes**
 
-* Global sequence.concurrent: true with top-level test(..., { concurrent: false }) \+ depreacte sequential test API and options  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Codex** and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10194](https://github.com/vitest-dev/vitest/pull/10194) [(9387f)](https://github.com/vitest-dev/vitest/commit/9387f57cf)
-* Test tags options should overwrite inherited suite options \+ inherit suite options in task API  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Codex** in [\#10216](https://github.com/vitest-dev/vitest/pull/10216) [(457db)](https://github.com/vitest-dev/vitest/commit/457db297b)
-* Udpate optimize deps config  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10223](https://github.com/vitest-dev/vitest/pull/10223) [(95dc6)](https://github.com/vitest-dev/vitest/commit/95dc6e3f1)
+* Revive global concurrency limit for test lifecycle  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa**, **OpenCode (claude-opus-4-8)** and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10928](https://github.com/vitest-dev/vitest/pull/10928) [(cf917)](https://github.com/vitest-dev/vitest/commit/cf9176bfc)
+* Own the post-restart rerun, keep process.exit disabled in workers  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10963](https://github.com/vitest-dev/vitest/pull/10963) [(5e69a)](https://github.com/vitest-dev/vitest/commit/5e69aba65)
+* Preserve correct root during resolve config  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10909](https://github.com/vitest-dev/vitest/pull/10909) [(210ba)](https://github.com/vitest-dev/vitest/commit/210ba00cb)
 * **browser**:
-  * Fix trace highlight of shadow dom on webdriverio  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10227](https://github.com/vitest-dev/vitest/pull/10227) [(b01af)](https://github.com/vitest-dev/vitest/commit/b01afd26c)
+  * Trigger playwright/chromium gc on lower disk availability  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode (claude-opus-4-8)** in [\#10912](https://github.com/vitest-dev/vitest/pull/10912) [(032d3)](https://github.com/vitest-dev/vitest/commit/032d31892)
+  * Disallow filter-only options in getBy\* locators  \-  by [**@arjun2075**](https://github.com/arjun2075) in [\#10295](https://github.com/vitest-dev/vitest/issues/10295) and [\#10933](https://github.com/vitest-dev/vitest/pull/10933) [(9b4df)](https://github.com/vitest-dev/vitest/commit/9b4df4b05)
+  * Fail instead of hanging when the browser stops responding  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10956](https://github.com/vitest-dev/vitest/pull/10956) [(c496c)](https://github.com/vitest-dev/vitest/commit/c496c2e33)
+  * Exit gracefully when the browser disconnects during cancellation  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10962](https://github.com/vitest-dev/vitest/pull/10962) [(67e84)](https://github.com/vitest-dev/vitest/commit/67e848564)
+  * Don't redirect vitest in client environment  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10975](https://github.com/vitest-dev/vitest/pull/10975) [(aeb67)](https://github.com/vitest-dev/vitest/commit/aeb672095)
 * **deps**:
-  * Update ivya to fix empty aria tree snapshot  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10218](https://github.com/vitest-dev/vitest/pull/10218) [(f7822)](https://github.com/vitest-dev/vitest/commit/f7822ebf6)
-* **runner**:
-  * Propagate chainable flags in describe.for  \-  by @DORI2001, **Dor Alagem** and [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10187](https://github.com/vitest-dev/vitest/pull/10187) [(db678)](https://github.com/vitest-dev/vitest/commit/db67831d7)
-  * Limit concurrency per task branch in addition to per leaf callbacks  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10179](https://github.com/vitest-dev/vitest/pull/10179) [(3112a)](https://github.com/vitest-dev/vitest/commit/3112abea2)
+  * Update all non-major dependencies  \-  in [\#10966](https://github.com/vitest-dev/vitest/pull/10966) [(65263)](https://github.com/vitest-dev/vitest/commit/65263d74e)
+* **mocker**:
+  * Restrict redirect mocks to the fs allowlist  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10972](https://github.com/vitest-dev/vitest/pull/10972) [(8ff9b)](https://github.com/vitest-dev/vitest/commit/8ff9b9a9e)
+* **pool**:
+  * Worker init to handle queued synchronous messages  \-  by [**@lazerg**](https://github.com/lazerg) and [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10932](https://github.com/vitest-dev/vitest/pull/10932) [(76096)](https://github.com/vitest-dev/vitest/commit/76096c769)
+  * Report the worker exit instead of a pipe error that raced it  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10964](https://github.com/vitest-dev/vitest/pull/10964) [(59a03)](https://github.com/vitest-dev/vitest/commit/59a037354)
+* **reporters**:
+  * Display test.name in GitHub Actions reporter summary header  \-  by [**@macarie**](https://github.com/macarie) in [\#10887](https://github.com/vitest-dev/vitest/pull/10887) [(49e24)](https://github.com/vitest-dev/vitest/commit/49e24fa38)
 * **snapshot**:
-  * Treat empty string as valid snapshot  \-  by [**@mayrang**](https://github.com/mayrang) and [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10188](https://github.com/vitest-dev/vitest/pull/10188) [(e145d)](https://github.com/vitest-dev/vitest/commit/e145d5756)
-* **spy**:
-  * Support private method spy types  \-  by [**@cyphercodes**](https://github.com/cyphercodes) in [\#10172](https://github.com/vitest-dev/vitest/issues/10172) and [\#10213](https://github.com/vitest-dev/vitest/pull/10213) [(628ab)](https://github.com/vitest-dev/vitest/commit/628ab32f1)
+  * Support no-unsafe-eval CSP by evaluating snapshot files on server  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10665](https://github.com/vitest-dev/vitest/pull/10665) [(667c1)](https://github.com/vitest-dev/vitest/commit/667c13954)
+* **ui**:
+  * Fix code editor error and annotations gadgets layout shifts  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode (claude-opus-4-8)** in [\#10969](https://github.com/vitest-dev/vitest/pull/10969) [(438ed)](https://github.com/vitest-dev/vitest/commit/438eda13f)
+  * Synchronize watch-run UI state on file removal  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode (claude-opus-4-8)** in [\#10941](https://github.com/vitest-dev/vitest/pull/10941) [(30c21)](https://github.com/vitest-dev/vitest/commit/30c21e668)
+  * Require auth for coverage report and all UI subtree requests  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10971](https://github.com/vitest-dev/vitest/pull/10971) [(5622f)](https://github.com/vitest-dev/vitest/commit/5622f0959)
+* **utils**:
+  * Don't crash on a malformed inline source map  \-  by [**@lazerg**](https://github.com/lazerg), **Hiroshi Ogawa**, **OpenCode (claude-opus-4-8)** and [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10892](https://github.com/vitest-dev/vitest/issues/10892) and [\#10893](https://github.com/vitest-dev/vitest/pull/10893) [(fe790)](https://github.com/vitest-dev/vitest/commit/fe7906275)
+* **vitest**:
+  * Render non-Error causes from env setup so the actual diagnostic is not dropped  \-  by [**@spokodev**](https://github.com/spokodev) in [\#10567](https://github.com/vitest-dev/vitest/pull/10567) [(b298d)](https://github.com/vitest-dev/vitest/commit/b298df609)
 
-    **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-beta.1...v5.0.0-beta.2)**
+    **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-rc.1...v5.0.0-rc.2)**
+
+[**v5.0.0-rc.3**](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0-rc.3)
+**Features**
+
+* Promote parseSpecifications out of experimental  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11087](https://github.com/vitest-dev/vitest/pull/11087) [(b628c)](https://github.com/vitest-dev/vitest/commit/b628cb680)
+* **coverage**:
+  * Switch to @vitest/istanbuljs packages  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#11053](https://github.com/vitest-dev/vitest/pull/11053) [(5f6a5)](https://github.com/vitest-dev/vitest/commit/5f6a5e84a)
+* **ui**:
+  * Highlight editor source locations  \-  by [**@sheremet-va**](https://github.com/sheremet-va), **Hiroshi Ogawa** and **OpenCode** in [\#11004](https://github.com/vitest-dev/vitest/pull/11004) [(bce2d)](https://github.com/vitest-dev/vitest/commit/bce2d3c2f)
+  * Navigate trace steps with keyboard and remove indirect editor focus  \-  by [**@sheremet-va**](https://github.com/sheremet-va), **Hiroshi Ogawa** and **OpenCode** in [\#11005](https://github.com/vitest-dev/vitest/pull/11005) [(6816f)](https://github.com/vitest-dev/vitest/commit/6816f3b17)
+  * Persist trace view selection in URL  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#10981](https://github.com/vitest-dev/vitest/pull/10981) [(3069e)](https://github.com/vitest-dev/vitest/commit/3069e5927)
+  * Toggle trace target highlight  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#11049](https://github.com/vitest-dev/vitest/pull/11049) [(cd63e)](https://github.com/vitest-dev/vitest/commit/cd63e9e43)
+
+**Bug Fixes**
+
+* Combine multiple \--project filters correctly  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10988](https://github.com/vitest-dev/vitest/pull/10988) [(66c1c)](https://github.com/vitest-dev/vitest/commit/66c1cbb53)
+* Fix recordArtifact location with vi.defineHelper  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#11047](https://github.com/vitest-dev/vitest/pull/11047) [(c2186)](https://github.com/vitest-dev/vitest/commit/c21865dfd)
+* Invalidate resolved setup files  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11073](https://github.com/vitest-dev/vitest/issues/11073) and [\#11081](https://github.com/vitest-dev/vitest/pull/11081) [(488c0)](https://github.com/vitest-dev/vitest/commit/488c04680)
+* Accept awaited value in vi.when thenResolve  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11084](https://github.com/vitest-dev/vitest/pull/11084) [(c10a1)](https://github.com/vitest-dev/vitest/commit/c10a12900)
+* Ignore computed member calls in static collection  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11085](https://github.com/vitest-dev/vitest/pull/11085) [(130f7)](https://github.com/vitest-dev/vitest/commit/130f79b8b)
+* **browser**:
+  * Don't hang when ui: true in projects  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10994](https://github.com/vitest-dev/vitest/pull/10994) [(9f710)](https://github.com/vitest-dev/vitest/commit/9f710d304)
+  * Preserve trace popover state  \-  by [**@liuluochen6-af**](https://github.com/liuluochen6-af), **Hiroshi Ogawa**, **OpenCode** and [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10906](https://github.com/vitest-dev/vitest/issues/10906) and [\#11021](https://github.com/vitest-dev/vitest/pull/11021) [(1bbc2)](https://github.com/vitest-dev/vitest/commit/1bbc278c2)
+* **coverage**:
+  * V8 to ignore Vite SSR's generated import bindings  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#11023](https://github.com/vitest-dev/vitest/pull/11023) [(c6174)](https://github.com/vitest-dev/vitest/commit/c6174a6cf)
+* **deps**:
+  * Update all non-major dependencies  \-  in [\#11043](https://github.com/vitest-dev/vitest/pull/11043) [(732df)](https://github.com/vitest-dev/vitest/commit/732df2c2b)
+* **snapshot**:
+  * Reject when toMatchFileSnapshot uses same snapshot file as toMatchSnapshot  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa**, **OpenCode** and [**@sheremet-va**](https://github.com/sheremet-va) in [\#10978](https://github.com/vitest-dev/vitest/pull/10978) [(17646)](https://github.com/vitest-dev/vitest/commit/17646ac72)
+* **ui**:
+  * Improve suite interaction and layout in explorer tree  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#10970](https://github.com/vitest-dev/vitest/pull/10970) [(91231)](https://github.com/vitest-dev/vitest/commit/9123111b3)
+  * Reveal explorer virtual scroller on resize  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#10998](https://github.com/vitest-dev/vitest/pull/10998) [(1f4fc)](https://github.com/vitest-dev/vitest/commit/1f4fcd363)
+  * Persist trace step-iframe split pane sizes  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode** in [\#11027](https://github.com/vitest-dev/vitest/pull/11027) [(3cd01)](https://github.com/vitest-dev/vitest/commit/3cd019a0a)
+* **vm**:
+  * Fall back to compiling from source when a module's code cache is rejected  \-  by [**@MarshallOfSound**](https://github.com/MarshallOfSound) in [\#11031](https://github.com/vitest-dev/vitest/pull/11031) [(c3ba1)](https://github.com/vitest-dev/vitest/commit/c3ba16b35)
+* **worker**:
+  * Bind stdio's early in case overriden  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#11020](https://github.com/vitest-dev/vitest/pull/11020) [(67ef7)](https://github.com/vitest-dev/vitest/commit/67ef7a19b)
+
+**Performance**
+
+* Initialize trace view in the orchestrator once per worker  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10984](https://github.com/vitest-dev/vitest/pull/10984) [(fad26)](https://github.com/vitest-dev/vitest/commit/fad263fe8)
+* **cache**:
+  * Hash the environment-invariant part of the fs module cache key once  \-  by [**@MarshallOfSound**](https://github.com/MarshallOfSound) in [\#11029](https://github.com/vitest-dev/vitest/pull/11029) [(1d365)](https://github.com/vitest-dev/vitest/commit/1d365db15)
+* **expect**:
+  * Avoid redefining matcher state  \-  by [**@scttcper**](https://github.com/scttcper) and **Codex** in [\#11048](https://github.com/vitest-dev/vitest/pull/11048) [(58e71)](https://github.com/vitest-dev/vitest/commit/58e71306b)
+* **vm**:
+  * Don't prewarm modules the worker never requests  \-  by [**@MarshallOfSound**](https://github.com/MarshallOfSound) and [**@sheremet-va**](https://github.com/sheremet-va) in [\#11033](https://github.com/vitest-dev/vitest/pull/11033) [(1e9f8)](https://github.com/vitest-dev/vitest/commit/1e9f80ec1)
+  * Let environments opt out of the module graph prewarm  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11078](https://github.com/vitest-dev/vitest/pull/11078) [(a6d5e)](https://github.com/vitest-dev/vitest/commit/a6d5ea2d8)
+
+    **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-rc.2...v5.0.0-rc.3)**
+
+[**v5.0.0-rc.4**](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0-rc.4)
+   **Breaking Changes**
+
+* Parse files statically in vitest list by default  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11088](https://github.com/vitest-dev/vitest/pull/11088) [(51e94)](https://github.com/vitest-dev/vitest/commit/51e949416)
+
+   **Features**
+
+* Promote clearCache out of experimental  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11086](https://github.com/vitest-dev/vitest/pull/11086) [(d4fe1)](https://github.com/vitest-dev/vitest/commit/d4fe1986f)
+* **ui**: Add link to open playwright trace  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode (gpt-5.6-sol)** in [\#11059](https://github.com/vitest-dev/vitest/pull/11059) [(58f02)](https://github.com/vitest-dev/vitest/commit/58f02ae36)
+
+   **Bug Fixes**
+
+* Don't duplicte oxc.target if user provides a custom array  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11095](https://github.com/vitest-dev/vitest/pull/11095) [(848d7)](https://github.com/vitest-dev/vitest/commit/848d7243e)
+* Propagate \--maxWorkers to projects  \-  by [**@Gaurav1112**](https://github.com/Gaurav1112) in [\#11102](https://github.com/vitest-dev/vitest/pull/11102) [(2122f)](https://github.com/vitest-dev/vitest/commit/2122ffdfb)
+* **browser**: Report the action error when a task times out  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11101](https://github.com/vitest-dev/vitest/pull/11101) [(dc10f)](https://github.com/vitest-dev/vitest/commit/dc10f5f8f)
+* **ui**: Add suite level report view  \-  by [**@dvmhmdsd**](https://github.com/dvmhmdsd), **Hiroshi Ogawa**, **OpenCode (gpt-5.6-sol)** and [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#11038](https://github.com/vitest-dev/vitest/pull/11038) [(602d2)](https://github.com/vitest-dev/vitest/commit/602d215ae)
+* **vm**: Link module graphs one at a time  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11096](https://github.com/vitest-dev/vitest/pull/11096) [(3f2dd)](https://github.com/vitest-dev/vitest/commit/3f2ddc21a)
+
+   **Performance**
+
+* **expect**: Lazily format spy matcher failures  \-  by [**@scttcper**](https://github.com/scttcper) and **Codex** in [\#11090](https://github.com/vitest-dev/vitest/pull/11090) [(e08c4)](https://github.com/vitest-dev/vitest/commit/e08c45c39)
+
+    **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-rc.3...v5.0.0-rc.4)**

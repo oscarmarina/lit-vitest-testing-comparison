@@ -126,7 +126,7 @@
   },
   "devDependencies": {
     "@blockquote/cem-to-markdown-readme": "^1.0.0",
-    "@blockquote/eslint-config": "^0.1.1",
+    "@blockquote/eslint-config": "^0.1.2",
     "@blockquote/rollup-plugin-total-bundlesize": "^2.4.0",
     "@blockquote/sass-style-template": "^5.2.0",
     "@custom-elements-manifest/analyzer": "^0.11.0",
@@ -134,16 +134,16 @@
     "@open-wc/testing-helpers": "^3.0.1",
     "@types/mocha": "^10.0.10",
     "@types/sinon": "^22.0.0",
-    "@vitest/browser-playwright": "^5.0.0-rc.2",
-    "@vitest/coverage-istanbul": "^5.0.0-rc.2",
-    "@vitest/coverage-v8": "^5.0.0-rc.2",
-    "@vitest/ui": "^5.0.0-rc.2",
+    "@vitest/browser-playwright": "^5.0.0-rc.4",
+    "@vitest/coverage-istanbul": "^5.0.0-rc.4",
+    "@vitest/coverage-v8": "^5.0.0-rc.4",
+    "@vitest/ui": "^5.0.0-rc.4",
     "chai-a11y-axe": "^1.5.0",
     "concurrently": "^10.0.5",
     "eslint": "^10.9.1",
     "globals": "^17.11.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.3.0",
+    "lint-staged": "^17.4.1",
     "lit-html": "^3.3.3",
     "playwright": "^1.62.1",
     "postcss-html": "^2.0.0",
@@ -159,7 +159,7 @@
     "typescript": "^6.0.3",
     "vite": "^8.2.2",
     "vite-plugin-static-copy": "^4.1.1",
-    "vitest": "^5.0.0-rc.2"
+    "vitest": "^5.0.0-rc.4"
   },
   "publishConfig": {
     "access": "public"
