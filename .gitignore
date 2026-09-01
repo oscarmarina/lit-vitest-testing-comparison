@@ -15,12 +15,14 @@
 
 ## testing
 **/coverage
+**/__traces__
 **/reports
 **/*screenshots*
 **/*snapshots*
 
 ## build
 **/_site
+**/.vitest
 **/dist
 **/dev
 **/build
