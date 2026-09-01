@@ -28,6 +28,10 @@ async function getCDPClickPointForElement(element: Element): Promise<{x: number;
 
   const {backendNodeId, frameId} = await getCDPNodeForElement(element);
 
+  // trace: 'on' can temporarily invalidate layout state after DOM
+  // mutation (marker removal). One rAF lets the pipeline stabilise.
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
   const {quads} = await client.send('DOM.getContentQuads', {
     backendNodeId,
   });

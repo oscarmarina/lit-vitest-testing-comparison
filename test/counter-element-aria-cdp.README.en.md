@@ -379,8 +379,10 @@ flowchart TB
 - `getAXNodeForElement` composes resolution + AX pull: exact element → live AX
   node by role and accessible name.
 - `getCDPClickPointForElement` turns the exact node into protocol click
-  coordinates via `DOM.getContentQuads()`, and verifies the point lands in the
-  target frame (hit-test as a *frame* cross-check, not as element resolution).
+  coordinates via `DOM.getContentQuads()`, translates from iframe to root-page
+  coordinates (via `DOM.querySelector('iframe[data-vitest="true"]')` +
+  `DOM.getBoxModel`), and uses a `requestAnimationFrame` wait to prevent empty
+  quads when `trace: 'on'` is active.
 - `getFullAXTree(frameId?)` makes the default-root vs. explicit-frame
   distinction explicit.
 
@@ -451,8 +453,11 @@ flowchart TB
 
 - The click coordinates come from **CDP geometry**, not from
   `getBoundingClientRect()`: `getCDPClickPointForElement` resolves the exact
-  button (`getCDPNodeForElement`) and reads its quad with
-  `DOM.getContentQuads()`, then verifies the point lands in the target frame.
+  button (`getCDPNodeForElement`), waits one `requestAnimationFrame` (to
+  stabilise the render pipeline when `trace: 'on'` is active), reads the
+  element's quad with `DOM.getContentQuads()`, and translates from iframe to
+  root-page coordinates (via `DOM.querySelector('iframe[data-vitest="true"]')` +
+  `DOM.getBoxModel`).
 - We dispatch `mouseMoved`, `mousePressed` and `mouseReleased` with
   `Input.dispatchMouseEvent` (the exact sequence a real click generates at the
   system level).
