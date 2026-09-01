@@ -385,9 +385,10 @@ flowchart TB
 - `getAXNodeForElement` compone resolución + extracción AX: elemento exacto →
   nodo AX vivo por rol y nombre accesible.
 - `getCDPClickPointForElement` convierte el nodo exacto en coordenadas de clic
-  de protocolo vía `DOM.getContentQuads()`, y verifica que el punto cae en el
-  frame objetivo (el hit-test solo como *cross-check* de frame, no como
-  resolución de elemento).
+  de protocolo vía `DOM.getContentQuads()`, traduce del iframe a coordenadas de
+  página raíz (vía `DOM.querySelector('iframe[data-vitest="true"]')` +
+  `DOM.getBoxModel`), y usa un `requestAnimationFrame` para evitar quads vacíos
+  cuando `trace: 'on'` está activo.
 - `getFullAXTree(frameId?)` hace explícita la distinción default-raíz vs.
   frame explícito.
 
@@ -460,8 +461,11 @@ flowchart TB
 
 - Las coordenadas del clic vienen de la **geometría CDP**, no de
   `getBoundingClientRect()`: `getCDPClickPointForElement` resuelve el botón
-  exacto (`getCDPNodeForElement`) y lee su quad con `DOM.getContentQuads()`,
-  después verifica que el punto cae en el frame objetivo.
+  exacto (`getCDPNodeForElement`), espera un `requestAnimationFrame` (para
+  estabilizar el pipeline de render cuando `trace: 'on'` está activo), lee su
+  quad con `DOM.getContentQuads()`, y traduce del iframe a coordenadas de
+  página raíz (vía `DOM.querySelector('iframe[data-vitest="true"]')` +
+  `DOM.getBoxModel`).
 - Disparamos `mouseMoved`, `mousePressed` y `mouseReleased` con
   `Input.dispatchMouseEvent` (la secuencia exacta que genera un clic real a
   nivel de sistema).

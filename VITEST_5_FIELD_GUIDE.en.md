@@ -456,9 +456,11 @@ but misses the actual target.
 either: it performs hit-testing and can return an overlay or touch target above
 the selected node.
 
-**Fix.** Resolve the exact element to its CDP `backendNodeId`, ask CDP for that
-node's geometry with `DOM.getContentQuads()`, calculate the center and dispatch
-the mouse events at that point:
+**Fix.** Resolve the exact element to its CDP `backendNodeId`, wait for the next
+animation frame (a `requestAnimationFrame` — avoids empty quads when
+`browser.trace: 'on'` is active), ask CDP for that node's geometry with
+`DOM.getContentQuads()`, translate the coordinates from the iframe viewport to
+the root-page viewport, and dispatch the mouse events at that point:
 
 ```ts
 async function getCDPClickPointForElement(
@@ -466,14 +468,17 @@ async function getCDPClickPointForElement(
 ): Promise<{x: number; y: number}> {
   await client.send('DOM.enable');
 
-  const {backendNodeId} =
+  const {backendNodeId, frameId} =
     await getCDPNodeForElement(element);
+
+  // trace: 'on' can temporarily invalidate layout after marker removal.
+  await new Promise<void>((resolve) =>
+    requestAnimationFrame(() => resolve())
+  );
 
   const {quads} = await client.send(
     'DOM.getContentQuads',
-    {
-      backendNodeId,
-    }
+    {backendNodeId}
   );
 
   if (!quads?.length) {
@@ -482,8 +487,7 @@ async function getCDPClickPointForElement(
     );
   }
 
-  const quad =
-    quads[0] as number[];
+  const quad = quads[0] as number[];
 
   if (quad.length !== 8) {
     throw new Error(
@@ -492,14 +496,30 @@ async function getCDPClickPointForElement(
   }
 
   // [x1, y1, x2, y2, x3, y3, x4, y4]
-  return {
-    x: Math.round(
-      (quad[0] + quad[2] + quad[4] + quad[6]) / 4
-    ),
-    y: Math.round(
-      (quad[1] + quad[3] + quad[5] + quad[7]) / 4
-    ),
-  };
+  let x = (quad[0] + quad[2] + quad[4] + quad[6]) / 4;
+  let y = (quad[1] + quad[3] + quad[5] + quad[7]) / 4;
+
+  // Translate from iframe to root-page coordinates
+  const {frameTree} = await client.send('Page.getFrameTree');
+
+  if (frameTree.frame.id !== frameId) {
+    const {node} = await client.send(
+      'DOM.getFrameOwner',
+      {frameId}
+    );
+
+    if (node?.backendNodeId) {
+      const {model} = await client.send(
+        'DOM.getBoxModel',
+        {backendNodeId: node.backendNodeId}
+      );
+
+      x += model.content[0];
+      y += model.content[1];
+    }
+  }
+
+  return {x: Math.round(x), y: Math.round(y)};
 }
 ```
 
