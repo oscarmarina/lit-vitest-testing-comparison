@@ -462,3 +462,62 @@ Vitest Beta
 * **expect**: Lazily format spy matcher failures  \-  by [**@scttcper**](https://github.com/scttcper) and **Codex** in [\#11090](https://github.com/vitest-dev/vitest/pull/11090) [(e08c4)](https://github.com/vitest-dev/vitest/commit/e08c45c39)
 
     **[View changes on GitHub](https://github.com/vitest-dev/vitest/compare/v5.0.0-rc.3...v5.0.0-rc.4)**
+
+[**v5.0.0**](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0)
+Vitest 5 is officially out\! This release focuses on performance and brings a lot of new features while fixing long-standing bugs. See our [blog post](https://vitest.dev/blog/vitest-5.html) for the official announcement.
+   **Breaking Changes**
+
+* Replace loupe.inspect with pretty-format  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Claude Opus 5 (1M context)** and **OpenAI Codex** in [\#9609](https://github.com/vitest-dev/vitest/pull/9609) [(3f802)](https://github.com/vitest-dev/vitest/commit/3f802da4b)
+* Remove quotes from string values in test.for/each title $ variable (take 2\)  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#10170](https://github.com/vitest-dev/vitest/pull/10170) [(04d37)](https://github.com/vitest-dev/vitest/commit/04d37e9d7)
+* Default attachmentsDir from .vitest-attachements/ to .vitest/attachments/  \-  by [**@MdSadiqMd**](https://github.com/MdSadiqMd) in [\#10186](https://github.com/vitest-dev/vitest/pull/10186) [(1ba73)](https://github.com/vitest-dev/vitest/commit/1ba7338c3)
+* Remove sequential test/suite options in favor of concurrent  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **OpenAI Codex** in [\#10198](https://github.com/vitest-dev/vitest/pull/10198) [(9229f)](https://github.com/vitest-dev/vitest/commit/9229f2edc)
+* Represent locator as an object instead of a string  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10212](https://github.com/vitest-dev/vitest/pull/10212) [(80f07)](https://github.com/vitest-dev/vitest/commit/80f07edf6)
+* Inline expect package  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10221](https://github.com/vitest-dev/vitest/pull/10221) [(ad162)](https://github.com/vitest-dev/vitest/commit/ad16223e7)
+* Remove deprecated entry points  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10222](https://github.com/vitest-dev/vitest/pull/10222) [(994c6)](https://github.com/vitest-dev/vitest/commit/994c6ddb9)
+* Require Node.js 22 and Vite 6.4  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10178](https://github.com/vitest-dev/vitest/pull/10178) [(38762)](https://github.com/vitest-dev/vitest/commit/3876283e8)
+* Fail expect.poll when function didn't resolve in time  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **OpenAI Codex** in [\#10233](https://github.com/vitest-dev/vitest/pull/10233) [(4df04)](https://github.com/vitest-dev/vitest/commit/4df048c11)
+* Throw an error if hoistable methods are outside the top level scope  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10460](https://github.com/vitest-dev/vitest/pull/10460) [(d0b4f)](https://github.com/vitest-dev/vitest/commit/d0b4fddcb)
+* toHaveTextContent is strict, add toMatchTextContent as alternative  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10473](https://github.com/vitest-dev/vitest/pull/10473) [(18f30)](https://github.com/vitest-dev/vitest/commit/18f303079)
+* Don't lookup config file from ancestor directories  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **OpenAI Codex** and **Hiroshi Ogawa** in [\#10428](https://github.com/vitest-dev/vitest/pull/10428) [(945d9)](https://github.com/vitest-dev/vitest/commit/945d9090e)
+* Inline @vitest/runner package, do not publish it anymore  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10511](https://github.com/vitest-dev/vitest/pull/10511) [(6d6e4)](https://github.com/vitest-dev/vitest/commit/6d6e46b1e)
+* Allow mutating happy-dom/jsdom window object  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenAI Codex** in [\#10373](https://github.com/vitest-dev/vitest/pull/10373) [(206e8)](https://github.com/vitest-dev/vitest/commit/206e8cff8)
+* Expose concurrencyId/workerId on TestModule's diagnostics, make id 1-based  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10516](https://github.com/vitest-dev/vitest/pull/10516) [(bdd98)](https://github.com/vitest-dev/vitest/commit/bdd985433)
+* Add screenshotDirectory config to browser.expect.toMatchScreenshot  \-  by [**@macarie**](https://github.com/macarie) in [\#10592](https://github.com/vitest-dev/vitest/pull/10592) [(a60de)](https://github.com/vitest-dev/vitest/commit/a60ded0fb)
+* Update @sinonjs/fake-timers and support mocking Temporal  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenCode (gpt-5.6-sol)** in [\#10654](https://github.com/vitest-dev/vitest/pull/10654) [(f8b15)](https://github.com/vitest-dev/vitest/commit/f8b1532fe)
+* Remove webdriverio package  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10675](https://github.com/vitest-dev/vitest/pull/10675) [(5fed6)](https://github.com/vitest-dev/vitest/commit/5fed68f72)
+* Clear mocks by default before each test  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10613](https://github.com/vitest-dev/vitest/pull/10613) [(0f646)](https://github.com/vitest-dev/vitest/commit/0f6463bf2)
+* Don't emit localStorage warnings on Node 26, fail gracefully when worker fails to start  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10293](https://github.com/vitest-dev/vitest/pull/10293) [(334ed)](https://github.com/vitest-dev/vitest/commit/334edef92)
+* Separate config resolution from the server creation  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10554](https://github.com/vitest-dev/vitest/pull/10554) [(1c0ec)](https://github.com/vitest-dev/vitest/commit/1c0ec3444)
+* Inline projects extend the root config by default  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10750](https://github.com/vitest-dev/vitest/pull/10750) [(fec00)](https://github.com/vitest-dev/vitest/commit/fec001ad3)
+* Enable mocking Temporal without fake timers  \-  by [**@fabon-f**](https://github.com/fabon-f), **Hiroshi Ogawa** and **OpenCode (gpt-5.6-sol)** in [\#10757](https://github.com/vitest-dev/vitest/pull/10757) [(ac2d4)](https://github.com/vitest-dev/vitest/commit/ac2d46b42)
+* Support nested projects  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10846](https://github.com/vitest-dev/vitest/pull/10846) [(ec367)](https://github.com/vitest-dev/vitest/commit/ec367cf2a)
+* Use \> as separator in \-t, calculate only once  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10686](https://github.com/vitest-dev/vitest/pull/10686) [(a0b20)](https://github.com/vitest-dev/vitest/commit/a0b20bc86)
+* Fail the test when an asynchronous assertion is not awaited  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10868](https://github.com/vitest-dev/vitest/pull/10868) [(86d4a)](https://github.com/vitest-dev/vitest/commit/86d4a9da9)
+* Share the Vite server between inline projects  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10848](https://github.com/vitest-dev/vitest/pull/10848) [(d87c9)](https://github.com/vitest-dev/vitest/commit/d87c96ee4)
+* Parse files statically in vitest list by default  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#11088](https://github.com/vitest-dev/vitest/pull/11088) [(51e94)](https://github.com/vitest-dev/vitest/commit/51e949416)
+* **benchmark**:
+  * Rewrite the public API  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10113](https://github.com/vitest-dev/vitest/pull/10113) [(19f6e)](https://github.com/vitest-dev/vitest/commit/19f6e8947)
+* **browser**:
+  * Iframe scale  \-  by [**@macarie**](https://github.com/macarie) in [\#9745](https://github.com/vitest-dev/vitest/pull/9745) [(b6398)](https://github.com/vitest-dev/vitest/commit/b639852cc)
+  * Enable locators.exact by default  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10430](https://github.com/vitest-dev/vitest/pull/10430) [(e2032)](https://github.com/vitest-dev/vitest/commit/e203202f9)
+  * Require sessionId for orchestrator html request  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenAI Codex** in [\#10522](https://github.com/vitest-dev/vitest/pull/10522) [(79b7d)](https://github.com/vitest-dev/vitest/commit/79b7d8fcc)
+  * Save failure screenshots in attachmentsDir  \-  by [**@macarie**](https://github.com/macarie) in [\#10917](https://github.com/vitest-dev/vitest/pull/10917) [(3b5bb)](https://github.com/vitest-dev/vitest/commit/3b5bbd8b4)
+* **coverage**:
+  * include/exclude globs too eager  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#9818](https://github.com/vitest-dev/vitest/pull/9818) [(edacb)](https://github.com/vitest-dev/vitest/commit/edacb0fd4)
+  * Allow thresholds.perFile to accept an object  \-  by [**@vladlenskiy**](https://github.com/vladlenskiy) and [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10190](https://github.com/vitest-dev/vitest/pull/10190) [(13b78)](https://github.com/vitest-dev/vitest/commit/13b78d98b)
+* **expect**:
+  * Fix toThrow("") behavior by reverting [\#6710](https://github.com/vitest-dev/vitest/pull/6710)  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) in [\#9643](https://github.com/vitest-dev/vitest/pull/9643) and [\#6710](https://github.com/vitest-dev/vitest/pull/6710) [(6c3e4)](https://github.com/vitest-dev/vitest/commit/6c3e4bdbf)
+* **mocker**:
+  * Deserialize automock as automock  \-  by [**@nami8824**](https://github.com/nami8824) in [\#10192](https://github.com/vitest-dev/vitest/pull/10192) [(2f892)](https://github.com/vitest-dev/vitest/commit/2f892712d)
+* **reporters**:
+  * blob reporter and \--merge-reports default to .vitest/blob/  \-  by [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10232](https://github.com/vitest-dev/vitest/pull/10232) [(d22b0)](https://github.com/vitest-dev/vitest/commit/d22b029ae)
+  * Write json and junit reporter output files to .vitest by default  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa**, **OpenCode (gpt-5.6-sol)** and [**@AriPerkkio**](https://github.com/AriPerkkio) in [\#10621](https://github.com/vitest-dev/vitest/pull/10621) [(58577)](https://github.com/vitest-dev/vitest/commit/58577290a)
+* **spy**:
+  * Preserve class mock prototype methods on instances  \-  by [**@sheremet-va**](https://github.com/sheremet-va) in [\#10910](https://github.com/vitest-dev/vitest/pull/10910) [(6093d)](https://github.com/vitest-dev/vitest/commit/6093d764a)
+* **types**:
+  * Add better promise support in expects and matchers  \-  by [**@samchungy**](https://github.com/samchungy) and [**@sheremet-va**](https://github.com/sheremet-va) in [\#8266](https://github.com/vitest-dev/vitest/pull/8266) [(41f55)](https://github.com/vitest-dev/vitest/commit/41f551bce)
+* **ui**:
+  * Harden UI API access  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa), **Hiroshi Ogawa** and **OpenAI Codex** in [\#10583](https://github.com/vitest-dev/vitest/pull/10583) [(4c26d)](https://github.com/vitest-dev/vitest/commit/4c26d7675)
+  * Change html reporter default output to .vitest  \-  by [**@hi-ogawa**](https://github.com/hi-ogawa) and **Hiroshi Ogawa** in [\#10620](https://github.com/vitest-dev/vitest/pull/10620) \[\<s...
+
+[Read more](https://github.com/vitest-dev/vitest/releases/tag/v5.0.0)

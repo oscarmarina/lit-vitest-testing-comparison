@@ -61,7 +61,7 @@ export default defineConfig(({command}) => ({
     browser: {
       enabled: true,
       headless: true,
-      trace: 'on',
+      trace: 'off',
       provider: playwright(),
       screenshotFailures: false,
       instances: [
