@@ -118,7 +118,7 @@
     ]
   },
   "overrides": {
-    "shell-quote": "^1.10.0"
+    "braces": "^3.0.3"
   },
   "dependencies": {
     "@material/web": "^2.5.0",
@@ -126,7 +126,7 @@
   },
   "devDependencies": {
     "@blockquote/cem-to-markdown-readme": "^1.0.0",
-    "@blockquote/eslint-config": "^0.1.6",
+    "@blockquote/eslint-config": "^0.1.12",
     "@blockquote/rollup-plugin-total-bundlesize": "^2.4.0",
     "@blockquote/sass-style-template": "^5.2.0",
     "@custom-elements-manifest/analyzer": "^0.11.0",
@@ -134,32 +134,32 @@
     "@open-wc/testing-helpers": "^3.0.1",
     "@types/mocha": "^10.0.10",
     "@types/sinon": "^22.0.0",
-    "@vitest/browser-playwright": "^5.0.0",
-    "@vitest/coverage-istanbul": "^5.0.0",
-    "@vitest/coverage-v8": "^5.0.0",
-    "@vitest/ui": "^5.0.0",
+    "@vitest/browser-playwright": "^5.0.3",
+    "@vitest/coverage-istanbul": "^5.0.3",
+    "@vitest/coverage-v8": "^5.0.3",
+    "@vitest/ui": "^5.0.3",
     "chai-a11y-axe": "^1.5.0",
-    "concurrently": "^10.0.5",
-    "eslint": "^10.10.0",
-    "globals": "^17.12.0",
+    "concurrently": "^10.0.6",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.5.1",
+    "lint-staged": "^17.6.0",
     "lit-html": "^3.3.3",
-    "playwright": "^1.63.0",
+    "playwright": "^1.64.0",
     "postcss-html": "^2.0.0",
     "postcss-lit": "^1.4.1",
-    "prettier": "^3.9.6",
+    "prettier": "^3.9.10",
     "rollup-plugin-node-externals": "^9.0.1",
     "sinon": "^22.1.0",
     "sort-package-json": "^4.0.0",
-    "stylelint": "^17.15.0",
+    "stylelint": "^17.16.0",
     "stylelint-config-standard-scss": "^17.0.0",
     "tinyglobby": "^0.2.17",
     "tslib": "^2.8.1",
     "typescript": "^6.0.3",
-    "vite": "^8.3.0",
+    "vite": "^8.3.4",
     "vite-plugin-static-copy": "^4.1.1",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.3"
   },
   "publishConfig": {
     "access": "public"
